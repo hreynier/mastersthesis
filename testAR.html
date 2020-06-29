@@ -9,7 +9,7 @@
     
 </head>
 <body style = 'margin: 0px; overflow: hidden;'>
-    <a-scene embedded arjs = "sourceType: webcam;" >
+    <a-scene embedded arjs = "sourceType: webcam;" gltf-model="dracoDecoderPath: ./src/three.js/draco/" >
         <a-assets>
             <!--<a-asset-item id="cathedral" src="./assets/cathedral-test/scene.gltf"></a-asset-item>-->
             <a-asset-item id="russel" src="./assets/RussellSqBlender.glb" response-type="arraybuffer"></a-asset-item>
@@ -20,7 +20,7 @@
         <a-marker preset = "hiro">
             <!--Adding entities to be shown on marker-->
             <!-- Gltf -->
-            <a-entity gltf-model="#russel" scale= "0.01 0.01 0.01" position="0 0 0" rotation="0 0 0" ></a-entity> 
+            <a-entity gltf-model="#nyc" scale= "0.001 0.001 0.001" position="0 0 0" rotation="0 0 0" ></a-entity> 
         </a-marker>
 
     </a-scene>
