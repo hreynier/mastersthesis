@@ -13,13 +13,14 @@
         <a-assets>
             <!--<a-asset-item id="cathedral" src="./assets/cathedral-test/scene.gltf"></a-asset-item>-->
             <a-asset-item id="russel" src="./assets/RussellSqBlender.glb" response-type="arraybuffer"></a-asset-item>
+            <a-asset-item id="nyc" src="./assets/NewYork.glb" response-type="arraybuffer"></a-asset-item>
           </a-assets>
 
         <a-entity camera></a-entity>
         <a-marker preset = "hiro">
             <!--Adding entities to be shown on marker-->
             <!-- Gltf -->
-            <a-entity gltf-model="#russel" scale= "0.1 0.1 0.1" position="0 0 0" rotation="0 0 0" ></a-entity> 
+            <a-entity gltf-model="#russel" scale= "0.01 0.01 0.01" position="0 0 0" rotation="0 0 0" ></a-entity> 
         </a-marker>
 
     </a-scene>
