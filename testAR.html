@@ -6,24 +6,39 @@
     <title>Project AR Testing</title>
     <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    
+    <script src="https://cdn.rawgit.com/etiennepinchon/aframe-material/master/dist/aframe-material.min.js"></script>
+    <script type="text/javascript">
+        AFRAME.ASSETS_PATH = "./src/material-ui";
+    </script>
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body style = 'margin: 0px; overflow: hidden;'>
+
+    <div class="forms">
+        <div class = "buttons">
+            <button id="hello">
+                Hello, click me to make a box!
+            </button>
+        </div>
+
+    </div>
     <a-scene embedded arjs = "sourceType: webcam;" gltf-model="dracoDecoderPath: ./src/three.js/draco/" >
         <a-assets>
             <!--<a-asset-item id="cathedral" src="./assets/cathedral-test/scene.gltf"></a-asset-item>-->
             <a-asset-item id="russel" src="./assets/RussellSqBlender.glb" response-type="arraybuffer"></a-asset-item>
             <a-asset-item id="nyc" src="./assets/NewYork.glb" response-type="arraybuffer"></a-asset-item>
-          </a-assets>
+        </a-assets>
 
-        <a-entity camera></a-entity>
         <a-marker preset = "hiro">
             <!--Adding entities to be shown on marker-->
             <!-- Gltf -->
-            <a-entity gltf-model="#nyc" scale= "0.001 0.001 0.001" position="0 0 0" rotation="0 0 0" ></a-entity> 
+
+            <a-entity gltf-model="#nyc" scale= "0.001 0.001 0.001" position="0 0 0" rotation="0 0 0" ></a-entity>
         </a-marker>
+        <a-entity camera></a-entity>
 
     </a-scene>
-    
+
+<script src = "./src/util/manhattan-test.js"></script>
 </body>
 </html>
