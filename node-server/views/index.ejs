@@ -1,0 +1,94 @@
+<html>
+<head>
+	<title>Camden TreePol API Documentation</title>
+	<link href="https://fonts.googleapis.com/css?family=Lato:300,700|Taviraj" rel="stylesheet">
+	<link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body>
+	<script src="./jquery.min.js"></script>
+	<div id="container">
+		
+		<div class = "container-fluid">
+			<h1>
+				TreePol API
+			</h1>
+		</div>
+		
+		
+		<h2>
+		Data Endpoints
+		</h2>
+
+		<p>
+			http://dev.spatialdatacapture.org:8703/data/:lat/:lon/:radius - <a href="http://dev.spatialdatacapture.org:8703/data/51.5390/-0.1426/10" target="_BLANK">Example: Returns all trees within 10m of camden town.</a><br/>
+			<b>Returns all tree spatial data from our database within a given radius (in meters) for a given lat/lng point.</b>
+		</p>	
+		
+		<p>
+			http://dev.spatialdatacapture.org:8703/data/treeDescription/:id - <a href="http://dev.spatialdatacapture.org:8703/data/treeDescription/9" target="_BLANK">Example: Tree #9</a> <br/>
+			<b>Returns a single tree's metadata inside our database for a given tree ID.</b>
+		
+		</p>
+
+		<p>
+			http://dev.spatialdatacapture.org:8703/data/tree/:commonname - <a href = "http://dev.spatialdatacapture.org:8703/data/tree/ash" target = "_BLANK">Example: Returns all 'Ash' trees.</a><br/>
+			<b>Returns all trees from our database for a given common name.</b>
+		</p>
+
+		<p>
+			http://dev.spatialdatacapture.org:8703/data/sust/:weight - <a href = "http://dev.spatialdatacapture.org:8703/data/sust/Carbon_Sequest_YR" target = "_BLANK">Example: Returns spatial data with carbon absorption per year.</a><br/>
+			<b>Returns spatial data with weights for use with heatmap.</b><br/>
+			Weights:
+				<ul>
+					<!--<li><em>Carbon_Sequest_YR</em>: Returns Carbon Sequestration in kg per yr for each tree.</li>
+					<li><em>Carbon_StorageKG</em>: Returns Carbon Storage in kg per tree.</li>-->
+					<li><em>Pollution_Year_grams</em>: Returns Pollution absorbed per year in grams per tree.</li>
+				</ul>
+			
+		</p>
+
+		<p>
+			http://dev.spatialdatacapture.org:8703/data/boundary - <a href = "http://dev.spatialdatacapture.org:8703/data/boundary" target = "_BLANK">Click to see data.</a><br/>
+			<b>Returns a geoJSON file that displays the ward boundaries of camden.</b>
+		</p>
+
+		<p>
+			/data/clusters - <a href = "http://dev.spatialdatacapture.org:8703/data/clusters" target = "_BLANK">Click here for data.</a><br/>
+			<b>Returns a JSON file for the clustering analysis results at the ward level.</b>
+			Currently shows clustering data regarding the pollution removal in grams, and the amnenity value of the trees.
+		</p>
+
+		<p>
+			/data/tree-types - <a href = "http://dev.spatialdatacapture.org:8703/data/tree-types" target = "_BLANK">Click here for data.</a><br/>
+			<b>Returns a JSON object that contains top 10 most common tree type, or species, in Camden.</br>The remaining trees were aggregated together, represented by the 'other' object. This endpoint is to be used in the chart.js script.</b>
+
+		</p>
+
+		<p>
+			/data/predict - <a href = "http://dev.spatialdatacapture.org:8703/data/predict" target = "_BLANK"> Click here for the data.</a></br>
+			<b>Returns the results of the predictive analytic tool, to predict the amount of pollution removed in the future.</b>
+		</p>
+
+		<p>
+			/data/predict-ward - <a href = "http://dev.spatialdatacapture.org:8703/data/predict-ward" target = "_BLANK"> Click here for the data.</a></br>
+			<b>Returns the results aggregated per ward of the predictive analytic tool, to predict the amount of pollution removed in the future.</b>
+		</p>
+
+		<p>
+			/data/highcharts/:measure - <a href = "http://dev.spatialdatacapture.org:8703/data/highcharts/Amenity_Value" target = "_BLANK">Example where measure is set to 'Amenity_Value'</a></br>
+			<b>Returns the data to be used in both highcharts graphs. This endpoint aggregates the average value (pollution removal kg/yr or amneity value £mill) across the top three most commone tree species per ward in Camden.</b>
+			The selected measure values are:
+			<ul>
+				<li>
+					<em>Pollution_Year_grams</em>: Returns the average value of pollution removal (kg/yr) across the top three most common tree species, aggregated through each ward.
+				</li>
+				<li>
+					<em>Amenity_Value</em>: Returns the average value of the Capital Amenity Value (£Mill) across the top three most common tree species, aggregated through each ward.
+				</li>
+			</ul>
+		</p>
+		
+	</div>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "server-for-immersive-urban-analytics",
+  "version": "1.0.0",
+  "description": "This serves the node server.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Harvey Reynier",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.3",
+    "express": "^4.17.1"
+  }
+}
