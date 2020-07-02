@@ -14,13 +14,16 @@
     
 </head>
 <body>
-    <a-scene gltf-model="dracoDecoderPath: ./src/three.js/draco/">
+    <a-scene cursor="rayOrigin: mouse" gltf-model="dracoDecoderPath: ./src/three.js/draco/">
         <a-assets>
-            <a-asset-item id="nyc" src="./assets/NewYork.glb" response-type="arraybuffer"></a-asset-item>
+            <!--<a-asset-item id="nyc" src="./assets/NewYork.glb" response-type="arraybuffer"></a-asset-item>-->
         </a-assets>
-    
-        <!-- BEGIN FORM -->
-        <a-rounded position="0.5 1 -2.5" width="4" height="3.1" radius="0.05" rotation="0 -20 0" scale="0.3 0.3 0.3">
+        <!--NEW YORK CITY MODEL-->
+        <!--<a-entity gltf-model="#nyc" scale= "0.001 0.001 0.001" position="-2 1 0" rotation="0 0 0" ></a-entity>-->
+
+        <!--INTERACTIVE GUI-->
+        <!-- FORM -->
+        <a-rounded position="0.5 1.5 -1.5" width="4" height="3.1" radius="0.05" rotation="0 -20 0" scale="0.3 0.3 0.3">
             <a-form>
             <a-switch position="0.2 2.7 0" enabled="true"></a-switch>
             <a-radio position="0.2 2.4 0" width="3" name="food" label="Burger with fries and pizza" value="pizza"></a-radio>
@@ -33,14 +36,22 @@
             </a-form>
         </a-rounded>
         <!-- END FORM -->
-        <a-entity camera look-controls wasd-controls position="0 3 0">
-            <a-entity cursor="fuse: true; fuseTimeout: 500 rayOrigin: mouse"
+
+        <!--ENTITIES-->
+        <a-plane class = "Base" height="100" width="100" rotation="-90 0 0" position="0 -2 0" color= "#d1cbcb"></a-plane>
+
+
+
+        <!--CAMERA-->
+        <a-entity camera look-controls wasd-controls="fly: true; acceleration: 85" position="0 1.6 0">
+            <a-entity cursor
                       position="0 0 -1"
                       geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
                       material="color: black; shader: flat">
             </a-entity>
         </a-entity>
-        <a-entity gltf-model="#nyc" scale= "0.001 0.001 0.001" position="-2 1 0" rotation="0 0 0" ></a-entity>
+
+        <!--END OF SCENE-->
     </a-scene>
 
     <script src="test.js"></script>

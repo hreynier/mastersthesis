@@ -1,40 +1,19 @@
+// - Data Collection + Processing - //
+// ---- AUTHOR: Harvey Reynier --- //
+// ------- DESCRIPTION ------- //
 
-const $ = (query) => document.querySelector(query);
+// DESCRIPTION GOES HERE.
 
-const sphere = $('a-sphere');
-const plane = $('a-plane');
+// Stations data.
+fetch('http://localhost:3000/data/subway-stations')
+  .then((response) => {
+    return response.json()
+  })
+  .then((data) => {
+    
+    console.log(data);
+  })
+  .catch((err) => {
+    console.log(err);
+  })
 
-const shiftDegrees = (value) => (value + 1) % 360;
-
-let degrees = 0;
-
-const animate = () => {
-  degrees = shiftDegrees(degrees);
-  const color = `hsl(${degrees}, 100%, 50%)`;
-  const variation = Math.sin(Date.now() / 1000);
-  const position = `0 ${1.5 + variation} -2`;
-  const rotation = `-90 0 ${degrees}`;
-
-  sphere.setAttribute('color', color);
-  sphere.setAttribute('position', position);
-
-  plane.setAttribute('color', color);
-  plane.setAttribute('rotation', rotation);
-
-  requestAnimationFrame(animate);
-};
-
-requestAnimationFrame(animate);
-
-// Component to change to a sequential color on click.
-AFRAME.registerComponent('cursor-listener', {
-  init: function () {
-    var lastIndex = -1;
-    var COLORS = ['red', 'green', 'blue'];
-    this.el.addEventListener('click', function (evt) {
-      lastIndex = (lastIndex + 1) % COLORS.length;
-      this.setAttribute('material', 'color', COLORS[lastIndex]);
-      console.log('I was clicked at: ', evt.detail.intersection.point);
-    });
-  }
-});
