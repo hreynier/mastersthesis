@@ -1,0 +1,23 @@
+{
+  "name": "immersive-urban-analytics-web-app",
+  "version": "1.0.0",
+  "description": "-",
+  "main": "test.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HarveyReynier/webAR-urban-analytics.git"
+  },
+  "author": "Harvey Reynier",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HarveyReynier/webAR-urban-analytics/issues"
+  },
+  "homepage": "https://github.com/HarveyReynier/webAR-urban-analytics#readme",
+  "dependencies": {
+    "@turf/bearing": "^6.0.1",
+    "@turf/distance": "^6.0.1"
+  }
+}
