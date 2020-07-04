@@ -2,6 +2,7 @@
   "name": "server-for-immersive-urban-analytics",
   "version": "1.0.0",
   "description": "This serves the node server.",
+  "private": true,
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
