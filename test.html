@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> A-Frame Test</title>
+
+    <!--A-FRAME SCRIPTS-->
     <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
     <script type="text/javascript">
         AFRAME.ASSETS_PATH = "./src/material-ui";
@@ -43,7 +45,7 @@
 
 
         <!--CAMERA-->
-        <a-entity camera look-controls wasd-controls="fly: true; acceleration: 85" position="0 1.6 0">
+        <a-entity camera look-controls wasd-controls="fly: true; acceleration: 100" position="0 1.6 0">
             <a-entity cursor
                       position="0 0 -1"
                       geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
@@ -53,7 +55,10 @@
 
         <!--END OF SCENE-->
     </a-scene>
-
-    <script src="test.js"></script>
+    <!--JS LIBRARIES-->
+    <!-- jQuery -->
+	<script type='text/javascript' src='http://code.jquery.com/jquery-1.10.2.min.js?ver=1.10.2'></script>
+    <!--JS SCRIPTS-->
+    <script type= 'text/javascript' src="test.js"></script>
 </body>
 </html>
