@@ -7,12 +7,21 @@
 //
 
 // Declare package imports.
-import distance from '@turf/distance';
-import bearing from '@turf/bearing';
+
+/*module.exports = {
+  distance: require('@turf/distance'),
+  bearing: require('@turf/bearing')
+};
+*/
+
+
+/*import distance from './src/turf.'
+import bearing from '@turf/bearing'
+*/
 
 // Declare globals
 let station_object = [];
-const mapCenter    = [-73.983313, 40.754149];
+const mapCenter    = [-73.953294, 40.756234];
 
 // Declare functions
 
@@ -21,14 +30,14 @@ function getCoordsFromCenter(centerCoordinates, nextCoordinates){
   let centerXY = {x: 0, y: 0}
 
   // Calculate bearing (degrees) and distance between two lat/lon pairs.
-  let coordBearing  = bearing(centerCoordinates, nextCoordinates);
-  let coordDistance = distance(centerCoordinates, nextCoordinates);
+  let coordBearing  = turf.bearing(centerCoordinates, nextCoordinates);
+  let coordDistance = turf.distance(centerCoordinates, nextCoordinates);
 
-  // Calculate XY, through solving a cartesian 2D coordinate problem. Unit is taken as 1m, change the '* 1000' to change the scale.
+  // Calculate XY, through solving a cartesian 2D coordinate problem. Unit is taken as 100m, change the '* 10' to change the scale.
   // See link for more: https://gis.stackexchange.com/questions/353701/converting-latitude-and-longitude-to-xy-coordinates
   const xy = {
-    x: centerXY.x + coordDistance * 1000 * Math.cos(coordBearing * Math.PI / 180),
-    y: centerXY.y + coordDistance * 1000 * Math.sin(coordBearing * Math.PI / 180)
+    x: centerXY.x + coordDistance * 10 * Math.cos(coordBearing * Math.PI / 180),
+    y: centerXY.y + coordDistance * 10 * Math.sin(coordBearing * Math.PI / 180)
   }
 
   return xy 
@@ -70,9 +79,9 @@ $(document).ready(function()  {
 
             let cartesian = getCoordsFromCenter(mapCenter, lonlat)
 
-            let positionZ = cartesian.y;
-            let positionX = cartesian.x;
-            console.log(`AFrame Y Position: ${positionZ}, AFrame X Position: ${positionX}`);
+            let positionX = cartesian.y;
+            let positionZ = -cartesian.x;
+            console.log(`AFrame Z Position: ${positionZ}, AFrame X Position: ${positionX}`);
 
             
             /*let aframeLat = -((latitude-40)*100);
@@ -81,7 +90,7 @@ $(document).ready(function()  {
 
             station = document.createElement('a-box');
             station.setAttribute('material', {color: 'red'});
-            station.setAttribute('position', {x: positionX, y: 1, z: positionZ});
+            station.setAttribute('position', {x: positionX, y: 0, z: positionZ});
             station.setAttribute('scale', {x: 1, y: 5, z: 1});
             sceneElement.appendChild(station);
 
