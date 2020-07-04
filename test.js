@@ -6,8 +6,34 @@
 // DESCRIPTION GOES HERE.
 //
 
+// Declare package imports.
+import distance from '@turf/distance';
+import bearing from '@turf/bearing';
+
 // Declare globals
 let station_object = [];
+const mapCenter    = [-73.983313, 40.754149];
+
+// Declare functions
+
+function getCoordsFromCenter(centerCoordinates, nextCoordinates){
+  // Declare center XY coordinate object.
+  let centerXY = {x: 0, y: 0}
+
+  // Calculate bearing (degrees) and distance between two lat/lon pairs.
+  let coordBearing  = turf.bearing(centerCoordinates, nextCoordinates);
+  let coordDistance = turf.distance(centerCoordinates, nextCoordinates);
+
+  // Calculate XY, through solving a cartesian 2D coordinate problem. Unit is taken as 1m.
+  // See link for more: https://gis.stackexchange.com/questions/353701/converting-latitude-and-longitude-to-xy-coordinates
+  const xy = {
+    x: centerXY.x + coordDistance * 1000 * Math.cos(coordBearing * Math.PI / 180),
+    y: centerXY.y + coordDistance * 1000 * Math.sin(coordBearing * Math.PI / 180)
+  }
+
+  return xy 
+}
+
 // jQuery Script - Requires DOM to load.
 $(document).ready(function()  {
   let sceneElement = document.querySelector('a-scene');
