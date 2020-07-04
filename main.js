@@ -21,10 +21,10 @@ function getCoordsFromCenter(centerCoordinates, nextCoordinates){
   let centerXY = {x: 0, y: 0}
 
   // Calculate bearing (degrees) and distance between two lat/lon pairs.
-  let coordBearing  = turf.bearing(centerCoordinates, nextCoordinates);
-  let coordDistance = turf.distance(centerCoordinates, nextCoordinates);
+  let coordBearing  = bearing(centerCoordinates, nextCoordinates);
+  let coordDistance = distance(centerCoordinates, nextCoordinates);
 
-  // Calculate XY, through solving a cartesian 2D coordinate problem. Unit is taken as 1m.
+  // Calculate XY, through solving a cartesian 2D coordinate problem. Unit is taken as 1m, change the '* 1000' to change the scale.
   // See link for more: https://gis.stackexchange.com/questions/353701/converting-latitude-and-longitude-to-xy-coordinates
   const xy = {
     x: centerXY.x + coordDistance * 1000 * Math.cos(coordBearing * Math.PI / 180),
@@ -65,13 +65,23 @@ $(document).ready(function()  {
             
             console.log(`Lat Type: ${typeof(latitude)}, Lon Type: ${typeof(longitude)}`);
             console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-            let aframeLat = -((latitude-40)*100);
+
+            let lonlat = [longitude, latitude];
+
+            let cartesian = getCoordsFromCenter(mapCenter, lonlat)
+
+            let positionZ = cartesian.y;
+            let positionX = cartesian.x;
+            console.log(`AFrame Y Position: ${positionZ}, AFrame X Position: ${positionX}`);
+
+            
+            /*let aframeLat = -((latitude-40)*100);
             let aframeLon = ((longitude+73)*100);
-            console.log(`AFrame Lat: ${aframeLat}, AFrame Lon: ${aframeLon}`);
+            console.log(`AFrame Lat: ${aframeLat}, AFrame Lon: ${aframeLon}`);*/
 
             station = document.createElement('a-box');
             station.setAttribute('material', {color: 'red'});
-            station.setAttribute('position', {x: aframeLon, y: 1, z: aframeLat});
+            station.setAttribute('position', {x: positionX, y: 1, z: positionZ});
             station.setAttribute('scale', {x: 1, y: 5, z: 1});
             sceneElement.appendChild(station);
 
