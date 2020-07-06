@@ -36,8 +36,8 @@ function getCoordsFromCenter(centerCoordinates, nextCoordinates){
   // Calculate XY, through solving a cartesian 2D coordinate problem. Unit is taken as 100m, change the '* 10' to change the scale.
   // See link for more: https://gis.stackexchange.com/questions/353701/converting-latitude-and-longitude-to-xy-coordinates
   const xy = {
-    x: centerXY.x + coordDistance * 10 * Math.cos(coordBearing * Math.PI / 180),
-    y: centerXY.y + coordDistance * 10 * Math.sin(coordBearing * Math.PI / 180)
+    x: centerXY.x + coordDistance * 1.68 * Math.cos(coordBearing * Math.PI / 180),
+    y: centerXY.y + coordDistance * 1.68 * Math.sin(coordBearing * Math.PI / 180)
   }
 
   return xy 
@@ -91,7 +91,7 @@ $(document).ready(function()  {
             station = document.createElement('a-box');
             station.setAttribute('material', {color: 'red'});
             station.setAttribute('position', {x: positionX, y: 0, z: positionZ});
-            station.setAttribute('scale', {x: 1, y: 5, z: 1});
+            station.setAttribute('scale', {x: 0.02, y: 5, z: 0.02});
             sceneElement.appendChild(station);
 
           })

@@ -12,16 +12,17 @@
     </script>
     <script src="https://rawgit.com/mayognaise/aframe-mouse-cursor-component/master/dist/aframe-mouse-cursor-component.min.js"></script>
     <script src="https://cdn.rawgit.com/etiennepinchon/aframe-material/master/dist/aframe-material.min.js"></script>
+    <script src="https://unpkg.com/aframe-mapbox-component/dist/aframe-mapbox-component.min.js"></script>
 
     
 </head>
 <body>
     <a-scene cursor="rayOrigin: mouse" gltf-model="dracoDecoderPath: ./src/three.js/draco/">
         <a-assets>
-            <a-asset-item id="nyc" src="./assets/NewYork.glb" response-type="arraybuffer"></a-asset-item>
+            <!--<a-asset-item id="nyc" src="./assets/NewYork.glb" response-type="arraybuffer"></a-asset-item>-->
         </a-assets>
         <!--NEW YORK CITY MODEL-->
-        <a-entity gltf-model="#nyc" scale= "0.01 0.01 0.01" position="0 0 0" rotation="0 0 0" ></a-entity>
+        <!--<a-entity gltf-model="#nyc" scale= "0.01 0.01 0.01" position="0 0 0" rotation="0 0 0" ></a-entity>-->
 
         <!--INTERACTIVE GUI-->
         <!-- FORM -->
@@ -40,12 +41,25 @@
         <!-- END FORM -->
 
         <!--ENTITIES-->
+        
+        <a-entity
+        geometry="primitive: plane; width: 50; height: 50;"
+        material="color: #ffffff; shader: flat; side: both; transparent: true;"
+        mapbox="center: -73.953294, 40.756234; zoom: 13; 
+          accesstoken: pk.eyJ1IjoiaG9vY2h5IiwiYSI6ImNrY2Fpc2pteTFqYmEzMGxqc2N3d3dzbm0ifQ.Ccht1_dtUtU_UWjVb85Eig;
+          style: mapbox://styles/mapbox/outdoors-v10;
+          pxToWorldRatio: 100;"
+        position="0 1 0"
+        rotation="-90 0 0"
+        
+      ></a-entity>
+      <!--zoom: 15.59;-->
         <a-plane class = "Base" height="100" width="100" rotation="-90 0 0" position="0 -2 0" color= "#d1cbcb"></a-plane>
 
 
 
         <!--CAMERA-->
-        <a-entity camera look-controls wasd-controls="fly: true; acceleration: 100" position="0 30 0">
+        <a-entity camera look-controls wasd-controls="fly: true; acceleration: 100" position="0 3 0">
             <a-entity cursor
                       position="0 0 -1"
                       geometry="primitive: ring; radiusInner: 0.02; radiusOuter: 0.03"
