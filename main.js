@@ -35,6 +35,7 @@ function getCoordsFromCenter(centerCoordinates, nextCoordinates){
 
   // Calculate XY, through solving a cartesian 2D coordinate problem. Unit is taken as 100m, change the '* 10' to change the scale.
   // See link for more: https://gis.stackexchange.com/questions/353701/converting-latitude-and-longitude-to-xy-coordinates
+  // https://stackoverflow.com/questions/1185408/converting-from-longitude-latitude-to-cartesian-coordinates
   const xy = {
     x: centerXY.x + coordDistance * 1.68 * Math.cos(coordBearing * Math.PI / 180),
     y: centerXY.y + coordDistance * 1.68 * Math.sin(coordBearing * Math.PI / 180)

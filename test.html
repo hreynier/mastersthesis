@@ -17,12 +17,12 @@
     
 </head>
 <body>
-    <a-scene cursor="rayOrigin: mouse" gltf-model="dracoDecoderPath: ./src/three.js/draco/">
+    <a-scene cursor="rayOrigin: mouse" gltf-model="dracoDecoderPath: ./src/three.js/draco/" debug='true'>
         <a-assets>
-            <!--<a-asset-item id="nyc" src="./assets/NewYork.glb" response-type="arraybuffer"></a-asset-item>-->
+            <a-asset-item id="nyc" src="./assets/lower-manhattan.glb" response-type="arraybuffer"></a-asset-item>
         </a-assets>
         <!--NEW YORK CITY MODEL-->
-        <!--<a-entity gltf-model="#nyc" scale= "0.01 0.01 0.01" position="0 0 0" rotation="0 0 0" ></a-entity>-->
+        <a-entity gltf-model="#nyc" scale= "0.00168 0.00168 0.00168" position="-8.155 1 8.815" rotation="0 0 0" ></a-entity>
 
         <!--INTERACTIVE GUI-->
         <!-- FORM -->
@@ -70,6 +70,8 @@
         <!--END OF SCENE-->
     </a-scene>
     <!--JS LIBRARIES-->
+    <!--A-Frame Inspector-->
+    <script type='text/javascript' src='https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js'></script>
     <!-- jQuery -->
     <script type='text/javascript' src='http://code.jquery.com/jquery-1.10.2.min.js?ver=1.10.2'></script>
     <!--Turf.js Modules-->
