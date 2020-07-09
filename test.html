@@ -17,11 +17,27 @@
     
 </head>
 <body>
-    <a-scene cursor="rayOrigin: mouse" gltf-model="dracoDecoderPath: ./src/three.js/draco/" debug='true'>
+    <a-scene cursor="rayOrigin: mouse" gltf-model="dracoDecoderPath: ./src/three.js/draco/" stats>
+
+        <!-- Asset Management System -->
         <a-assets>
             <a-asset-item id="nyc" src="./assets/lower-manhattan.glb" response-type="arraybuffer"></a-asset-item>
+            <!--<a-asset-item id="cd1" src="./assets/nyc-model/cd1.gltf"></a-asset-item>
+            <a-asset-item id="cd2" src="./assets/nyc-model/cd2.gltf"></a-asset-item>
+            <a-asset-item id="cd3" src="./assets/nyc-model/cd3.gltf"></a-asset-item>
+            <a-asset-item id="cd4" src="./assets/nyc-model/cd4.gltf"></a-asset-item>
+            <a-asset-item id="cd5" src="./assets/nyc-model/cd5.gltf"></a-asset-item>
+            <a-asset-item id="cd6" src="./assets/nyc-model/cd6.gltf"></a-asset-item>-->
         </a-assets>
+
         <!--NEW YORK CITY MODEL-->
+        <!--<a-entity gltf-model='#cd1' scale= "0.00168 0.00168 0.00168" position="-8.169 1 8.841"></a-entity>
+        <a-entity gltf-model='#cd2' scale= "0.00168 0.00168 0.00168" position="-8.146 1 8.846"></a-entity>
+        <a-entity gltf-model='#cd3' scale= "0.00168 0.00168 0.00168" position="-8.168 1 8.848"></a-entity>
+        <a-entity gltf-model='#cd4' scale= "0.00168 0.00168 0.00168" position="-8.160 1 8.830"></a-entity>
+        <a-entity gltf-model='#cd5' scale= "0.00168 0.00168 0.00168" position="-8.153 1 8.835"></a-entity>
+        <a-entity gltf-model='#cd6' scale= "0.00168 0.00168 0.00168" position="-8.140 1 8.835"></a-entity>-->
+
         <a-entity gltf-model="#nyc" scale= "0.00168 0.00168 0.00168" position="-8.155 1 8.815" rotation="0 0 0" ></a-entity>
 
         <!--INTERACTIVE GUI-->
@@ -42,7 +58,7 @@
 
         <!--ENTITIES-->
         
-        <a-entity
+        <!--<a-entity
         geometry="primitive: plane; width: 50; height: 50;"
         material="color: #ffffff; shader: flat; side: both; transparent: true;"
         mapbox="center: -73.953294, 40.756234; zoom: 13; 
@@ -52,7 +68,7 @@
         position="0 1 0"
         rotation="-90 0 0"
         
-      ></a-entity>
+      ></a-entity>-->
       <!--zoom: 15.59;-->
         <a-plane class = "Base" height="100" width="100" rotation="-90 0 0" position="0 -2 0" color= "#d1cbcb"></a-plane>
 
