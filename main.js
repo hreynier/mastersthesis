@@ -73,7 +73,7 @@ $(document).ready(function()  {
             latitude = parseFloat(point[2]);
             longitude = parseFloat(point[1]);
             
-            console.log(`Lat Type: ${typeof(latitude)}, Lon Type: ${typeof(longitude)}`);
+            //console.log(`Lat Type: ${typeof(latitude)}, Lon Type: ${typeof(longitude)}`);
             console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
 
             let lonlat = [longitude, latitude];
@@ -101,7 +101,48 @@ $(document).ready(function()  {
     })
   }
 
-  getStations()
+  // Function to get air pollution.
+  function getPollution(pollutant, year){
+    let url = `http://localhost:3000/data/air-pollution/${pollutant}/${year}`;
+    //console.log(`API Endpoint: ${url}`);
+
+    $.getJSON(url, function(data){
+      // Declare variables
+      let latitude;
+      let longitude;
+      let pol;
+
+      // Loop through each row.
+      $.each(data, function(key, val){
+        latitude  = parseFloat(val.lat);
+        longitude = parseFloat(val.lon);
+        pol       = parseFloat(val.value);
+
+        console.log(`Lat: ${latitude}, lon: ${longitude}, pol: ${pol}`);
+
+        let latlon = [latitude, longitude];
+
+        let cartesian = getCoordsFromCenter(mapCenter, latlon)
+
+        let positionX = cartesian.x;
+        let positionZ = -cartesian.y;
+        console.log(`AFrame Z Position: ${positionZ}, AFrame X Position: ${positionX}`);
+
+        let pollution = document.createElement('a-sphere');
+        pollution.setAttribute('material', {color: 'blue'});
+        pollution.setAttribute('position', {x: positionX, y: 2, z: positionZ});
+        pollution.setAttribute('scale', {x:0.1, y:0.1, z:0.1});
+        sceneElement.appendChild(pollution);
+        
+
+
+      })
+    })
+
+  }
+
+  //getStations()
+  getPollution("no", 2018);
   
 })
 
