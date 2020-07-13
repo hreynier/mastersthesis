@@ -145,7 +145,7 @@ $(document).ready(function()  {
   function stylePollution(minimum, maximum, row){
     let loCol  = [255,255,153];
     let hiCol  = [255,80,80];
-    let loSize = 0.01;
+    let loSize = 0.005;
     let hiSize = 0.5;
     let loHeight = 1.1;
     let hiHeight = 3;
@@ -181,111 +181,154 @@ $(document).ready(function()  {
     sceneElement.appendChild(obj);
   }
 
-  // Function to get air pollution.
-  /*function getPollution(pollutant, year){
-    let url = `http://localhost:3000/data/air-pollution/${pollutant}/${year}`;
-    //console.log(`API Endpoint: ${url}`);
+  async function fetchEmbeddedData(datafamily){
+    let url = `http://localhost:3000/data/embed/${datafamily}`;
 
-    $.getJSON(url, function(data){
-      // Declare variables
-      let latitude;
-      let longitude;
-      let pol;
-      let polMin = Number.MAX_VALUE;
-      let polMax = Number.MIN_VALUE;
-      let pollArr        = [];
+    let pop00Min = Number.MAX_VALUE;
+    let pop00Max = Number.MIN_VALUE;
+    let pop10Min = Number.MAX_VALUE;
+    let pop10Max = Number.MIN_VALUE;
+    let popDiffMin = Number.MAX_VALUE;
+    let popDiffMax = Number.MIN_VALUE;
+    let resultArr = [];
 
-      // Loop through each row.
-      $.each(data, function(key, val){
-        latitude  = parseFloat(val.lat);
-        longitude = parseFloat(val.lon);
-        pol       = parseFloat(val.value);
 
-        let array = [latitude, longitude, pol];
-
-        if(pol > polMax){
-          polMax = pol;
-        }
-        if(pol < polMin){
-          polMin = pol;
-        }
-        pollArr.push(array);
-      })
-
-      const pollution = {
-        min: polMin,
-        max: polMax,
-        value: pollArr
+    const response = await fetch(url);
+    const json = await response.json();
+    
+    for(var i=0; i < json.length; i++){
+      let obj = json[i];
+      let distName = (obj.CDName);
+      let population2000 = parseInt(obj.pop2000);
+      let population2010 = parseInt(obj.pop2010);
+      let populationChange = parseFloat(obj.popChange);
+      //console.log(`lat: ${lat}, lon: ${lon}, type: ${typeof(lon)}`);
+      if(population2000 > pop00Max){
+          pop00Max = population2000;
       }
-      console.log(pollution);
-      return pollution
-    })
+      if(population2000 < pop00Min){
+          pop00Min = population2000;
+      }
+
+      if(population2010 > pop10Max){
+        pop10Max = population2010;
+      }
+      if(population2010 < pop10Min){
+        pop10Min = population2010;
+      }
+
+      if(populationChange > popDiffMax){
+        popDiffMax = populationChange;
+      }
+      if(populationChange < popDiffMin){
+        popDiffMin = populationChange;
+      } 
+      
+      let array = [distName, population2000, population2010, populationChange];
+      resultArr.push(array);
+    }
+
+    const population = {
+      min00: pop00Min,
+      max00: pop00Max,
+      min10: pop10Min,
+      max10: pop10Max,
+      minDiff: popDiffMin,
+      maxDiff: popDiffMax,
+      data: resultArr
+    }
+
+    let styledOut = colourEmbedded(population);
+    console.log(styledOut);
+
+    return styledOut;
   }
 
-  async function stylePollution(pollutant, year){
-    let loCol  = [49,70,54];
-    let hiCol  = [118,41,51];
-    let loSize = 0.01;
-    let hiSize = 1;
-    let loHeight = 1.1;
-    let hiHeight = 3;
+  function colourEmbedded(dataObject){
 
-    if(pollutionObject === undefined){
-      pollutionObject = await fetchPollution(pollutant, year);
+    let loCol  = [255,255,153];
+    let hiCol  = [255,80,80];
 
-      let min = pollutionObject.min;
-      let max = pollutionObject.max;
-      let array = pollutionObject.pollArr;
+    let min00   = dataObject.min00;
+    let max00   = dataObject.max00;
+    
+    let min10   = dataObject.min10;
+    let max10   = dataObject.max10;
 
-      for(var x of array){
-        let lat = x[1];
-        let lon = x[2];
-        let val = x[3];
-        let latlon = [lat,lon];
-        let cartesian = getCoordsFromCenter(mapCenter, latlon);
+    let minDiff   = dataObject.minDiff;
+    let maxDiff   = dataObject.maxDiff;
 
-        let positionX = cartesian.y;
-        let positionZ = -cartesian.x;
+    let array = dataObject.data;
 
-        //	Delta represents ratio of where the data value sits between min and max.
-        let delta = (val - min) / (max - min);
+    let district  = [];
+    let style00   = [];
+    let style10   = [];
+    let styleDiff = [];
 
-        //	Assign colour based on ratio between min and max datum, and thus min and max color.
-        var colour = [];
-        for ( var i = 0; i < 3; i++ ) {
-          colour[i] = (hiCol[i] - loCol[i]) * delta + loCol[i];
-        }
+    for(x of array){
 
-        let size = (hiSize-loSize)* delta + loSize;
-        let height = (hiHeight - loHeight) * delta + loHeight;
+      let delta00 = (x[1] - min00) / (max00 - min00);
+      let delta10 = (x[2] - min10) / (max10 - min10);
+      let deltaDiff = (x[3] - minDiff) / (maxDiff - minDiff);
 
+      //	Assign colour based on ratio between min and max datum, and thus min and max color.
+      let colour00 = [];
+      let colour10 = [];
+      let colourDiff = [];
 
-
-        let obj = document.createElement('a-sphere');
-        obj.setAttribute('material', {color: `hsl(${colour})`});
-        obj.object3D.position.set(positionX, height,positionZ);
-        obj.object3D.scale.set(size, size, size);
-        sceneElement.appendChild(obj);
+      for ( var i = 0; i < 3; i++ ) {
+        colour00[i]       = parseInt((hiCol[i] - loCol[i]) * delta00 + loCol[i]);
+        colour10[i]       = parseInt((hiCol[i] - loCol[i]) * delta10 + loCol[i]);
+        colourDiff[i]     = parseInt((hiCol[i] - loCol[i]) * deltaDiff + loCol[i]);
       }
 
+      district.push(x[0]);
+      style00.push(colour00);
+      style10.push(colour10);
+      styleDiff.push(colourDiff);
     }
-    else{
-    }
-  }*/
-  // AFrame Components -> move to separaete js file in header.
+    const styleObject = {
+      district: district,
+      pop00: style00,
+      pop10: style10,
+      popDiff: styleDiff
+    };
 
-  //getStations()
-  //getPollution("no", 2018);
-  //stylePollution("no", 2018);
+    return styleObject
+  }
 
   let polObject;
-  let polPromise = fetchPollution('no', 2018);
+  /*let polPromise = fetchPollution('no', 2018);
   // Store in object to access the data later.
   let polData = polPromise.then(function(object){
     console.log(object);
     polObject = object;
     return
+  });*/
+
+  
+  let popPromise = fetchEmbeddedData('population');
+  // Store in object to access the data later.
+  let popObj = popPromise.then(value => {
+    console.log(`This is the value: ${value}`);
+    return value
   });
+  
+  console.log(`This is the popObj: ${popObj}`);
+  console.log(popObj);
+
+  setTimeout(() => {
+    console.log(popObj);
+  },3000);
+  
+  // Need to make this globally scoped AKA remove all jquery lol.
+  let popData = popPromise.then(function(object){
+    //console.log(object);
+    popObj = object;
+    return
+  })
+
+  
 
 
 

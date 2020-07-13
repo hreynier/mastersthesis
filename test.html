@@ -14,8 +14,9 @@
     <script src="https://cdn.rawgit.com/etiennepinchon/aframe-material/master/dist/aframe-material.min.js"></script>
     <script src="https://unpkg.com/aframe-mapbox-component/dist/aframe-mapbox-component.min.js"></script>
     <script src="https://unpkg.com/aframe-orbit-controls@1.2.0/dist/aframe-orbit-controls.min.js"></script>
-    <script src="https://unpkg.com/aframe-geometry-merger-component/dist/aframe-geometry-merger-component.min.js"></script> 
-
+    <script src="https://unpkg.com/aframe-geometry-merger-component/dist/aframe-geometry-merger-component.min.js"></script>
+     
+    <script src="components.js"></script>
     
 </head>
 <body>
@@ -33,13 +34,13 @@
         </a-assets>
 
         <!--NEW YORK CITY MODEL-->
-        <!--<a-entity class="NYC" geometry-merger="preserveOriginal: false">
-            <a-entity gltf-model='#cd1' scale= "0.00168 0.00168 0.00168" position="-8.169 1 8.841" geometry='buffer: false'></a-entity>
-            <a-entity gltf-model='#cd2' scale= "0.00168 0.00168 0.00168" position="-8.146 1 8.846" geometry='buffer: false'></a-entity>
-            <a-entity gltf-model='#cd3' scale= "0.00168 0.00168 0.00168" position="-8.168 1 8.848" geometry='buffer: false'></a-entity>
-            <a-entity gltf-model='#cd4' scale= "0.00168 0.00168 0.00168" position="-8.160 1 8.830" geometry='buffer: false'></a-entity>
-            <a-entity gltf-model='#cd5' scale= "0.00168 0.00168 0.00168" position="-8.153 1 8.835" geometry='buffer: false'></a-entity>
-            <a-entity gltf-model='#cd6' scale= "0.00168 0.00168 0.00168" position="-8.140 1 8.835" geometry='buffer: false'></a-entity>
+        <a-entity class="NYC" geometry-merger="preserveOriginal: false">
+            <a-entity id="cd1" gltf-model='#cd1' scale= "0.00168 0.00168 0.00168" position="-8.169 1 8.841" geometry='buffer: false' embed-data></a-entity>
+            <a-entity id="cd2" gltf-model='#cd2' scale= "0.00168 0.00168 0.00168" position="-8.146 1 8.846" geometry='buffer: false' embed-data></a-entity>
+            <a-entity id="cd3" gltf-model='#cd3' scale= "0.00168 0.00168 0.00168" position="-8.168 1 8.848" geometry='buffer: false' embed-data></a-entity>
+            <a-entity id="cd4" gltf-model='#cd4' scale= "0.00168 0.00168 0.00168" position="-8.160 1 8.830" geometry='buffer: false' embed-data></a-entity>
+            <a-entity id="cd5" gltf-model='#cd5' scale= "0.00168 0.00168 0.00168" position="-8.153 1 8.835" geometry='buffer: false' embed-data></a-entity>
+            <a-entity id="cd6" gltf-model='#cd6' scale= "0.00168 0.00168 0.00168" position="-8.140 1 8.835" geometry='buffer: false' embed-data></a-entity>
         </a-entity>-->
         
 
