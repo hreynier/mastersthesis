@@ -111,7 +111,40 @@ app.get('/data/air-pollution/:pollutant/:year', function(req, res){
     }
 })
 
+// Returns JSON for data aggregated at the district level in Manhattan. This data is visualised through an embedded method
+// on the 3D models.
 
+app.get('/data/embed/:datafamily', function(req, res){
+
+    //  Allows data to be downloaded from the server with security concerns.
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-WithD");
+
+    // If all the variables are provided, continue with GET request.
+    if(req.params.datafamily != ""){
+        // Parse variables.
+        let filename = req.params.datafamily;
+
+        // Define local path to access locally stored data.
+        let options = {
+            root: path.join(__dirname, '/data')
+        };
+
+        let file = `${filename}.json`;
+
+        console.log(`Sending data from file: ${file}`);
+        res.sendFile(file, options ,function (err){
+            if (err)    {
+                console.log(err);
+            }   else    {
+                console.log(`Data Sent: ${file}`);
+            }
+        });
+
+
+    }    
+
+});
 // Setup the server and print a string to the screen when server is ready.
 var server = app.listen(port, function () {
     var host = server.address().address;
