@@ -19,130 +19,301 @@
 import bearing from '@turf/bearing'
 */
 
+
+  
+
 // Declare globals
 const mapCenter    = [-73.953294, 40.756234];
+const sceneElement = document.querySelector('a-scene');
 
 // Declare global arrays + objects
 let station_object = [];
 let pollutionObject;
 
 
-
 // Declare functions
 function getCoordsFromCenter(centerCoordinates, nextCoordinates){
-  // Declare center XY coordinate object.
-  const centerXY = {x: 0, y: 0}
-
-  // Calculate bearing (degrees) and distance between two lat/lon pairs.
-  let coordBearing  = turf.bearing(centerCoordinates, nextCoordinates);
-  let coordDistance = turf.distance(centerCoordinates, nextCoordinates);
-
-  // Calculate XY, through solving a cartesian 2D coordinate problem. Unit is taken as 100m, change the '* 10' to change the scale.
-  // See link for more: https://gis.stackexchange.com/questions/353701/converting-latitude-and-longitude-to-xy-coordinates
-  // https://stackoverflow.com/questions/1185408/converting-from-longitude-latitude-to-cartesian-coordinates
-  const xy = {
-    x: centerXY.x + coordDistance * 1.68 * Math.cos(coordBearing * Math.PI / 180),
-    y: centerXY.y + coordDistance * 1.68 * Math.sin(coordBearing * Math.PI / 180)
-  }
-
-  return xy 
+    // Declare center XY coordinate object.
+    const centerXY = {x: 0, y: 0}
+  
+    // Calculate bearing (degrees) and distance between two lat/lon pairs.
+    let coordBearing  = turf.bearing(centerCoordinates, nextCoordinates);
+    let coordDistance = turf.distance(centerCoordinates, nextCoordinates);
+  
+    // Calculate XY, through solving a cartesian 2D coordinate problem. Unit is taken as 100m, change the '* 10' to change the scale.
+    // See link for more: https://gis.stackexchange.com/questions/353701/converting-latitude-and-longitude-to-xy-coordinates
+    // https://stackoverflow.com/questions/1185408/converting-from-longitude-latitude-to-cartesian-coordinates
+    const xy = {
+        x: centerXY.x + coordDistance * 1.68 * Math.cos(coordBearing * Math.PI / 180),
+        y: centerXY.y + coordDistance * 1.68 * Math.sin(coordBearing * Math.PI / 180)
+    }
+  
+    return xy 
 }
 
-// jQuery Script - Requires DOM to load.
-$(document).ready(function()  {
-  let sceneElement = document.querySelector('a-scene');
-  
-  // Stations Data
-  function getStations(){
-    let url = "http://localhost:3000/data/subway-stations";
+// Stations Data
+async function getPoints(pointType){
+    let url = `http://localhost:3000/data/${pointType}`;
     console.log(`API Endpoint: ${url}`);
 
-    $.getJSON(url, function(data){
-      // Declare variables
-      let latitude;
-      let longitude;
-      let point;
-      let station;
+    // Declare Variables to assign values to.
+    let latitude;
+    let longitude;
+    let location;
+    let dataName;
+    let dataValue;
+    let posX = [];
+    let posZ = [];
+    let posY = [];
+    let posXYZ = [];
 
-      // Loop through each row.
-      $.each(data, function(key, value){
-        console.log(`Row Number: ${key}, Value: ${value}`);
+    // Execute fetch request + store through promises.
+    const response  = await fetch(url);
+    const json      = await response.json();
+    
+    // As JSON file is delivered as an object from the open NYC datastore, need to
+    // parse correctly.
+    const entries = Object.entries(json);
+
+    // Loop through JSON to extract values.
+    for(const [key, val] of entries){
+        //console.log(`There are ${value} of ${key}`);
+
+        // JSON object has meta subobject and data subobject. We need to loop through the data.
         if(key == 'data'){
-          $.each(value, function(id, val){
-            point   = val[11];
-            station = val[10];
-            console.log(`Station: ${station}`);
-            point = point.replace(/[^0-9.+-\s]/g,''); //String RegExp
-            point = point.split(' ');
-            latitude = parseFloat(point[2]);
-            longitude = parseFloat(point[1]);
-            
-            //console.log(`Lat Type: ${typeof(latitude)}, Lon Type: ${typeof(longitude)}`);
-            console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+            for(let [index, entry] of Object.entries(val)){
+                //console.log(`Entry: ${entry}, Ind: ${index}`);
 
-            let lonlat = [longitude, latitude];
+                // Assign location and data name to variables. This is hard coded, but can be soft coded.
+                // by parsing through the meta data and using if loops to determine index of where location etc is.
+                location   = entry[11];
+                dataName = entry[10];
 
-            let cartesian = getCoordsFromCenter(mapCenter, lonlat)
+                //console.log(`Location: ${location}, Value/Name: ${dataValue}/${dataName}`);
 
-            let positionX = cartesian.y;
-            let positionZ = -cartesian.x;
-            console.log(`AFrame Z Position: ${positionZ}, AFrame X Position: ${positionX}`);
+                // Location data is stored as 'POINT(-70.56456 42.243524543)' and such we need to extract the lat/lon from this.
+                // This is done using String RegExpressions.
+                location = location.replace(/[^0-9.+-\s]/g,'');
+                location = location.split(' ');
 
-            
-            /*let aframeLat = -((latitude-40)*100);
-            let aframeLon = ((longitude+73)*100);
-            console.log(`AFrame Lat: ${aframeLat}, AFrame Lon: ${aframeLon}`);*/
+                // Starts from 1 as first entry is the initial space.
+                latitude = parseFloat(location[2]);
+                longitude = parseFloat(location[1]);
+                //console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
 
-            station = document.createElement('a-box');
-            station.setAttribute('material', {color: 'red'});
-            station.setAttribute('position', {x: positionX, y: 0, z: positionZ});
-            station.setAttribute('scale', {x: 0.02, y: 5, z: 0.02});
-            sceneElement.appendChild(station);
+                // Store lat/lon pair in array and calculate cartesian position for use in AFrame environment.
+                let lonlat = [longitude, latitude];
+                let cartesian = getCoordsFromCenter(mapCenter, lonlat);
+                let positionX = cartesian.y;
+                let positionZ = -cartesian.x; //Not sure why this is x/y reverse? but it works.
+                let positionY = 0;
+                //console.log(`AFrame Z Position: ${positionZ}, AFrame X Position: ${positionX}`);
 
-          })
+                posX.push(positionX);
+                posZ.push(positionZ);
+                posY.push(positionY);
+                let row = [positionX, positionY, positionZ];
+                posXYZ.push(row);
+            }
         }
-      })
-    })
-  }
+    }
+    let position = {
+        xyz: posXYZ
+    }
+    return position;
+}
 
-  async function fetchPollution(pollutant, year){
-    let url = `http://localhost:3000/data/air-pollution/${pollutant}/${year}`;
-    //console.log(`pol: ${pollutant}, year: ${year}, url: ${url}`);
-    let polMin = Number.MAX_VALUE;
-    let polMax = Number.MIN_VALUE;
-    let pollArr        = [];
+function renderPoint(positionObject, elementClass, geom, col){
+
+    for(let [index, entry] of Object.entries(positionObject)){
+        //console.log(`index: ${index}, value: ${entry}`);
+        for(let [ind, ent] of Object.entries(entry)){
+            //console.log(`ind: ${ind}, Row : ${ent}`);
+            let posX = parseFloat(ent[0]);
+            let posY = parseFloat(ent[1]);
+            let posZ = parseFloat(ent[2]);
+
+            console.log(`posX: ${posX}, Y: ${posY}, Z: ${posZ}`);
+
+            // Create new element for points.
+            let pointEl = document.createElement('a-entity');
+            pointEl.setAttribute('class', elementClass);
+            pointEl.setAttribute('position', {x: posX, y: posY, z: posZ});
+            pointEl.setAttribute('material', {color: col});
+            pointEl.setAttribute('geometry', {primitive: geom, width: 1, height: 1, depth: 1});
+            pointEl.setAttribute('scale', {x: 0.02, y: 5, z: 0.02}); // Hard-coded - need to implement update method.
+            //console.log(`Element: ${ind}`);
+           
+
+            sceneElement.appendChild(pointEl);
+
+        }
+    }
+    
+}
+
+
+async function fetchEmbeddedData(datafamily){
+    let url = `http://localhost:3000/data/embed/${datafamily}`;
+
+    let pop00Min = Number.MAX_VALUE;
+    let pop00Max = Number.MIN_VALUE;
+    let pop10Min = Number.MAX_VALUE;
+    let pop10Max = Number.MIN_VALUE;
+    let popDiffMin = Number.MAX_VALUE;
+    let popDiffMax = Number.MIN_VALUE;
+    let resultArr = [];
+
+
     const response = await fetch(url);
     const json = await response.json();
     
+    for(var i=0; i < json.length; i++){
+        let obj = json[i];
+        let distName = (obj.CDName);
+        let population2000 = parseInt(obj.pop2000);
+        let population2010 = parseInt(obj.pop2010);
+        let populationChange = parseFloat(obj.popChange);
+        //console.log(`lat: ${lat}, lon: ${lon}, type: ${typeof(lon)}`);
+        if(population2000 > pop00Max){
+            pop00Max = population2000;
+        }
+        if(population2000 < pop00Min){
+            pop00Min = population2000;
+        }
+
+        if(population2010 > pop10Max){
+            pop10Max = population2010;
+        }
+        if(population2010 < pop10Min){
+            pop10Min = population2010;
+        }
+
+        if(populationChange > popDiffMax){
+            popDiffMax = populationChange;
+        }
+        if(populationChange < popDiffMin){
+            popDiffMin = populationChange;
+        } 
+        
+        let array = [distName, population2000, population2010, populationChange];
+        resultArr.push(array);
+    }
+
+    const population = {
+        min00: pop00Min,
+        max00: pop00Max,
+        min10: pop10Min,
+        max10: pop10Max,
+        minDiff: popDiffMin,
+        maxDiff: popDiffMax,
+        data: resultArr
+    }
+
+    let styledOut = colourEmbedded(population);
+    console.log(styledOut);
+
+    return styledOut;
+}
+
+function colourEmbedded(dataObject){
+
+    let loCol  = [222, 235, 247];
+    let hiCol  = [50, 134, 195];
+
+    let min00   = dataObject.min00;
+    let max00   = dataObject.max00;
+
+    let min10   = dataObject.min10;
+    let max10   = dataObject.max10;
+
+    let minDiff   = dataObject.minDiff;
+    let maxDiff   = dataObject.maxDiff;
+
+    let array = dataObject.data;
+
+    let district  = [];
+    let style00   = [];
+    let style10   = [];
+    let styleDiff = [];
+
+    for(x of array){
+
+        let delta00 = (x[1] - min00) / (max00 - min00);
+        let delta10 = (x[2] - min10) / (max10 - min10);
+        let deltaDiff = (x[3] - minDiff) / (maxDiff - minDiff);
+
+        //	Assign colour based on ratio between min and max datum, and thus min and max color.
+        let colour00 = [];
+        let colour10 = [];
+        let colourDiff = [];
+
+        for ( var i = 0; i < 3; i++ ) {
+            colour00[i]       = parseInt((hiCol[i] - loCol[i]) * delta00 + loCol[i]);
+            colour10[i]       = parseInt((hiCol[i] - loCol[i]) * delta10 + loCol[i]);
+            colourDiff[i]     = parseInt((hiCol[i] - loCol[i]) * deltaDiff + loCol[i]);
+        }
+
+        district.push(x[0]);
+        style00.push(colour00);
+        style10.push(colour10);
+        styleDiff.push(colourDiff);
+    }
+    const styleObject = {
+        district: district,
+        pop00: style00,
+        pop10: style10,
+        popDiff: styleDiff
+    };
+
+    return styleObject
+}
+
+async function fetchValues(dataFamily, dataType, year){
+
+    // Store API url.
+    let url = `http://localhost:3000/data/${dataFamily}/${dataType}/${year}`;
+    //console.log(`pol: ${pollutant}, year: ${year}, url: ${url}`);
+
+    // Set up variables to store processed values.
+    let valMin = Number.MAX_VALUE;
+    let valMax = Number.MIN_VALUE;
+    let valArr        = [];
+
+    // Query API.
+    const response = await fetch(url);
+    const json = await response.json();
+    
+    // Loop through json assigining the locational data and the value data.
     for(var i=0; i < json.length; i++){
         let obj = json[i];
         let lat = parseFloat(obj.lat);
         let lon = parseFloat(obj.lon);
         let val = parseFloat(obj.value);
         //console.log(`lat: ${lat}, lon: ${lon}, type: ${typeof(lon)}`);
-        if(val > polMax){
-            polMax = val;
+
+        // Determine the min and max values
+        if(val > valMax){
+            valMax = val;
         }
-        if(val < polMin){
-            polMin = val;
+        if(val < valMin){
+            valMin = val;
         }
         
         let array = [lat, lon, val];
-        pollArr.push(array);
-    }
-    const pollution = {
-        min: polMin,
-        max: polMax,
-        data: pollArr
-    }
-    for(var x of pollution.data){
-        stylePollution(pollution.min, pollution.max, x);
+        valArr.push(array);
     }
 
-    return pollution;
-  }
+    const data = {
+        min: valMin,
+        max: valMax,
+        array: valArr
+    }
 
-  function stylePollution(minimum, maximum, row){
+    return data;
+}
+
+function stylePollutionData(minimum, maximum, row){
     let loCol  = [255,255,153];
     let hiCol  = [255,80,80];
     let loSize = 0.005;
@@ -175,201 +346,32 @@ $(document).ready(function()  {
     let height = (hiHeight - loHeight) * delta + loHeight;
 
     let obj = document.createElement('a-sphere');
+    obj.setAttribute('class', 'pollution');
     obj.setAttribute('material', {color: `rgb(${colour[0]},${colour[1]}, ${colour[2]})`});
     obj.object3D.position.set(positionX, height, positionZ);
     obj.object3D.scale.set(size, size, size);
     sceneElement.appendChild(obj);
-  }
+}
 
-  async function fetchEmbeddedData(datafamily){
-    let url = `http://localhost:3000/data/embed/${datafamily}`;
+// Get population data.
+/*let popPromise = fetchEmbeddedData('population');
+// Store in object to access the data later.
+let popObj = popPromise.then(value => {
+  console.log(`This is the value: ${value}`);
+  return value
+});*/
 
-    let pop00Min = Number.MAX_VALUE;
-    let pop00Max = Number.MIN_VALUE;
-    let pop10Min = Number.MAX_VALUE;
-    let pop10Max = Number.MIN_VALUE;
-    let popDiffMin = Number.MAX_VALUE;
-    let popDiffMax = Number.MIN_VALUE;
-    let resultArr = [];
+// Get subway data.
+/*let subwayStations = getPoints('subway-stations');
+subwayStations.then(value => {
+    let renderStations = renderPoint(value, 'stations', 'box', 'red');
+    return renderStations
+})*/
 
-
-    const response = await fetch(url);
-    const json = await response.json();
-    
-    for(var i=0; i < json.length; i++){
-      let obj = json[i];
-      let distName = (obj.CDName);
-      let population2000 = parseInt(obj.pop2000);
-      let population2010 = parseInt(obj.pop2010);
-      let populationChange = parseFloat(obj.popChange);
-      //console.log(`lat: ${lat}, lon: ${lon}, type: ${typeof(lon)}`);
-      if(population2000 > pop00Max){
-          pop00Max = population2000;
-      }
-      if(population2000 < pop00Min){
-          pop00Min = population2000;
-      }
-
-      if(population2010 > pop10Max){
-        pop10Max = population2010;
-      }
-      if(population2010 < pop10Min){
-        pop10Min = population2010;
-      }
-
-      if(populationChange > popDiffMax){
-        popDiffMax = populationChange;
-      }
-      if(populationChange < popDiffMin){
-        popDiffMin = populationChange;
-      } 
-      
-      let array = [distName, population2000, population2010, populationChange];
-      resultArr.push(array);
+// Get NOx pollution data for 2018.
+let pollNO18 = fetchValues('air-pollution', 'no', 2018);
+pollNO18.then(value => {
+    for(var x of value.array){
+        stylePollutionData(value.min, value.max, x);
     }
-
-    const population = {
-      min00: pop00Min,
-      max00: pop00Max,
-      min10: pop10Min,
-      max10: pop10Max,
-      minDiff: popDiffMin,
-      maxDiff: popDiffMax,
-      data: resultArr
-    }
-
-    let styledOut = colourEmbedded(population);
-    console.log(styledOut);
-
-    return styledOut;
-  }
-
-  function colourEmbedded(dataObject){
-
-    let loCol  = [255,255,153];
-    let hiCol  = [255,80,80];
-
-    let min00   = dataObject.min00;
-    let max00   = dataObject.max00;
-    
-    let min10   = dataObject.min10;
-    let max10   = dataObject.max10;
-
-    let minDiff   = dataObject.minDiff;
-    let maxDiff   = dataObject.maxDiff;
-
-    let array = dataObject.data;
-
-    let district  = [];
-    let style00   = [];
-    let style10   = [];
-    let styleDiff = [];
-
-    for(x of array){
-
-      let delta00 = (x[1] - min00) / (max00 - min00);
-      let delta10 = (x[2] - min10) / (max10 - min10);
-      let deltaDiff = (x[3] - minDiff) / (maxDiff - minDiff);
-
-      //	Assign colour based on ratio between min and max datum, and thus min and max color.
-      let colour00 = [];
-      let colour10 = [];
-      let colourDiff = [];
-
-      for ( var i = 0; i < 3; i++ ) {
-        colour00[i]       = parseInt((hiCol[i] - loCol[i]) * delta00 + loCol[i]);
-        colour10[i]       = parseInt((hiCol[i] - loCol[i]) * delta10 + loCol[i]);
-        colourDiff[i]     = parseInt((hiCol[i] - loCol[i]) * deltaDiff + loCol[i]);
-      }
-
-      district.push(x[0]);
-      style00.push(colour00);
-      style10.push(colour10);
-      styleDiff.push(colourDiff);
-    }
-    const styleObject = {
-      district: district,
-      pop00: style00,
-      pop10: style10,
-      popDiff: styleDiff
-    };
-
-    return styleObject
-  }
-
-  let polObject;
-  /*let polPromise = fetchPollution('no', 2018);
-  // Store in object to access the data later.
-  let polData = polPromise.then(function(object){
-    console.log(object);
-    polObject = object;
-    return
-  });*/
-
-  
-  let popPromise = fetchEmbeddedData('population');
-  // Store in object to access the data later.
-  let popObj = popPromise.then(value => {
-    console.log(`This is the value: ${value}`);
-    return value
-  });
-  
-  console.log(`This is the popObj: ${popObj}`);
-  console.log(popObj);
-
-  setTimeout(() => {
-    console.log(popObj);
-  },3000);
-  
-  // Need to make this globally scoped AKA remove all jquery lol.
-  let popData = popPromise.then(function(object){
-    //console.log(object);
-    popObj = object;
-    return
-  })
-
-  
-
-
-
-
-  /*
-  console.log(`Lat: ${latitude}, lon: ${longitude}, pol: ${pol}`);
-
-        let latlon = [latitude, longitude];
-
-        let cartesian = getCoordsFromCenter(mapCenter, latlon)
-
-        let positionX = cartesian.y;
-        let positionZ = -cartesian.x;
-        console.log(`AFrame Z Position: ${positionZ}, AFrame X Position: ${positionX}`);
-
-        let pollution = document.createElement('a-sphere');
-        pollution.setAttribute('material', {color: 'blue'});
-        pollution.setAttribute('position', {x: positionX, y: 2, z: positionZ});
-        pollution.setAttribute('scale', {x:0.1, y:0.1, z:0.1});
-        sceneElement.appendChild(pollution);
-  */
-  
-})
-
-
-
-
-// Stations data.
-/*fetch('http://localhost:3000/data/subway-stations')
-  .then((response) => {
-    return response.json()
-  })
-  .then((data) => {
-    data.forEach(obj => {
-      Object.entries(obj).forEach(([key, value]) => {
-        console.log(`${key} ${value}`);
-      });  
-    console.log('----------');
-  });
-  })
-  .catch((err) => {
-    console.log(err);
-  })*/
-
+}) 

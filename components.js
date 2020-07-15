@@ -15,67 +15,94 @@ AFRAME.registerComponent('embed-data', {
     init: function () {
         let el = this.el;
         let data = this.data;
+        let colours;
 
         // Wait for model to load.
         el.addEventListener('model-loaded', () => {
             let id = el.id;
             let district;
             console.log(`This is the id: ${id}`);
-            switch(id){
-                case 'cd1':
-                    district=1;
-                    break;
-                case 'cd2':
-                    district=2;
-                    break;
-                case 'cd3':
-                    district=3;
-                    break;
-                case 'cd4':
-                    district=4;
-                    break;
-                case 'cd5':
-                    district=5;
-                    break;
-                case 'cd6':
-                    district=6;
-            }
-
+            
             if(popObj){
-                let minimum;
-                let maximum;
-                let dataset = popObj.data;
-                let colNo;
-
-                switch(data){
-                    case 'pop2000':
-                        minimum = popObj.min00;
-                        maximum = popObj.max00;
-                        colNo = 1;
-                        break;
-                    case 'pop2010':
-                        minimum = popObj.min10;
-                        maximum = popObj.max10;
-                        colNo = 2;
-                        break;
-                    case 'popChange':
-                        minimum = popObj.minDiff;
-                        maximum = popObj.maxDiff;
-                        colNo = 3;
-                }
                 
-                for(var i=0; i < dataset.length; i++){
+                console.log(`Component object input: ${popObj}`);
+                popObj.then(value => {
+                    let inputData = value;
+                    let col;
 
-                }
+                    switch(data){
+                        case 'pop2000':
+                            col = inputData.pop00;
+                            break;
+                        
+                        case 'pop2010':
+                            col = inputData.pop10;
+                            break;
+                        case 'popDiff':
+                            col = inputData.popDiff;
+
+                    }
+
+                    switch(id){
+                        case 'cd1':
+                            district=0;
+                            colours = col[district];
+                            
+                            break;
+                        case 'cd2':
+                            district=1;
+                            colours = col[district];
+                            break;
+                        case 'cd3':
+                            district=2;
+                            colours = col[district];
+                            break;
+                        case 'cd4':
+                            district=3;
+                            colours = col[district];
+                            break;
+                        case 'cd5':
+                            district=4;
+                            colours = col[district];
+                            break;
+                        case 'cd6':
+                            district=5;
+                            colours = col[district];
+                    }
+
+                    //console.log(`colors: ${colours[0]}`);
+
+                    // Grab the mesh/scene.
+                    const obj = el.getObject3D('mesh');
+
+                    if(id == 'cd1'){
+                        for(row of obj.children){
+                            for(x of row.children){
+                                x.material.metalness = 0;
+                                x.material.color.set(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
+                            }
+                        }
+                    }
+                    else{
+                        for(x of obj.children){
+                            //console.log(x);
+                            if(x.material){
+                                x.material.metalness = 0;
+                                x.material.color.set(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
+                            }
+                        }
+                    }
+                    
+                    //obj.color = new THREE.Color(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
+                    //obj.material.color.set(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
+
+
+                })
+
             }
-            //Grab the mesh / scene.
-            const obj = el.getObject3D('mesh');
-            // Go over the submeshes and modify materials we want.
-            obj.traverse(node => {
-                if (node.name.indexOf('ship') !== -1) {
-                    node.material.color.set('red');
-                }
-            });
+            else{
+                console.log(`The input data does not exist. This may be due to an async error.`);
+            }
         });
     }   
 });
