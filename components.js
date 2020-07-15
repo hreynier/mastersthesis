@@ -3,6 +3,8 @@
 // ------- DESCRIPTION ------- //
 
 
+
+
 // DESCRIPTION GOES HERE.
 //
 
@@ -92,10 +94,6 @@ AFRAME.registerComponent('embed-data', {
                             }
                         }
                     }
-                    
-                    //obj.color = new THREE.Color(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
-                    //obj.material.color.set(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
-
 
                 })
 
@@ -104,5 +102,74 @@ AFRAME.registerComponent('embed-data', {
                 console.log(`The input data does not exist. This may be due to an async error.`);
             }
         });
-    }   
+    },
+    remove: function(){
+        const el = this.el;
+        const data = this.data;
+        const id = el.id;
+        const obj = el.getObject3D('mesh');
+        let baseColor = [127, 135, 148];
+
+
+        
+
+        if(id == 'cd1'){
+            for(row of obj.children){
+                for(x of row.children){
+                    if(x.material){
+                        x.material.color.set(`rgb(${baseColor[0]}, ${baseColor[1]}, ${baseColor[2]})`);
+                    }
+                    
+                }
+            }
+        }
+        else{
+            for(x of obj.children){
+                if(x.material){
+                    x.material.color.set(`rgb(${baseColor[0]}, ${baseColor[1]}, ${baseColor[2]})`);
+                }
+            }
+        }
+
+    }
+
+});
+
+// Sets the metal and color of the gltf models so that on initial load they look like this.
+AFRAME.registerComponent('model-initial-settings', {
+    init: function() {
+        const el = this.el
+        const id = el.id;
+        
+        let baseColor = [127, 135, 148];
+
+        //console.log(`element: ${el}`);
+        // Wait for model to load.
+        el.addEventListener('model-loaded', () => {
+            const obj = el.getObject3D('mesh');
+
+            if(id == 'cd1'){
+                for(row of obj.children){
+                    for(x of row.children){
+                        if(x.material){
+                            x.material.color.set(`rgb(${baseColor[0]}, ${baseColor[1]}, ${baseColor[2]})`);
+
+                            x.material.metalness = 0;
+                            //console.log(`Color for ${id} set: ${x.material.color}, ${x.material.metalness}`);
+                        }
+                        
+                    }
+                }
+            }
+            else{
+                for(x of obj.children){
+                    if(x.material){
+                        x.material.color.set(`rgb(${baseColor[0]}, ${baseColor[1]}, ${baseColor[2]})`);
+                        x.material.metalness = 0;
+                        //console.log(`Color for ${id} set: ${x.material.color}, ${x.material.metalness}`);
+                    }
+                }
+            }
+        })
+    }
 });

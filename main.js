@@ -353,6 +353,13 @@ function stylePollutionData(minimum, maximum, row){
     sceneElement.appendChild(obj);
 }
 
+
+
+
+
+//--------- SCRIPTS -------//
+// Need to think of a better title for this.
+
 // Get population data.
 /*let popPromise = fetchEmbeddedData('population');
 // Store in object to access the data later.
@@ -369,9 +376,9 @@ subwayStations.then(value => {
 })*/
 
 // Get NOx pollution data for 2018.
-let pollNO18 = fetchValues('air-pollution', 'no', 2018);
+/*let pollNO18 = fetchValues('air-pollution', 'no', 2018);
 pollNO18.then(value => {
     for(var x of value.array){
         stylePollutionData(value.min, value.max, x);
     }
-}) 
+}) */
