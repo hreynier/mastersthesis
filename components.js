@@ -80,7 +80,7 @@ AFRAME.registerComponent('embed-data', {
                     if(id == 'cd1'){
                         for(row of obj.children){
                             for(x of row.children){
-                                x.material.metalness = 0;
+                                
                                 x.material.color.set(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
                             }
                         }
@@ -89,7 +89,7 @@ AFRAME.registerComponent('embed-data', {
                         for(x of obj.children){
                             //console.log(x);
                             if(x.material){
-                                x.material.metalness = 0;
+                                
                                 x.material.color.set(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
                             }
                         }
