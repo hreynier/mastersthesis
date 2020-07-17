@@ -345,8 +345,9 @@ function stylePollutionData(minimum, maximum, row) {
 	let size = (hiSize - loSize) * delta + loSize;
 	let height = (hiHeight - loHeight) * delta + loHeight;
 
-	let obj = document.createElement('a-sphere');
+	let obj = document.createElement('a-entity');
 	obj.setAttribute('class', 'pollution');
+	obj.setAttribute('geometry', 'primitive: sphere');
 	obj.setAttribute('material', { color: `rgb(${colour[0]},${colour[1]}, ${colour[2]})` });
 	obj.object3D.position.set(positionX, height, positionZ);
 	obj.object3D.scale.set(size, size, size);
@@ -393,8 +394,8 @@ let threeMenuBtn = document.querySelector('a-button[name=three-menu]');
 
 // Declare the three sub-menus
 let pointMenu = document.getElementById('point-menu');
-let embedMenu = document.querySelector('#embed-menu');
-let threeMenu = document.querySelector('#three-menu');
+let embedMenu = document.getElementById('embed-menu');
+let threeMenu = document.getElementById('three-menu');
 
 // Declare their visibility to allow simple toggling.
 let pointVis = pointMenu.getAttribute('visible');
@@ -431,4 +432,64 @@ threeMenuBtn.addEventListener('click', () => {
 	}
 })
 
+// function to get all the radio values from a form.
+function getRadio(form, name){
+	let value;
+	// Grab list of radio buttons with the specified name.
+	let radios = document.querySelectorAll(`#${form} > [name=${name}] `);
+	Array.from(radios).forEach( function (el) {
+		let checked = el.getAttribute('checked');
+		if (checked == 'true'){
+			value = el.getAttribute('label');
+			console.log(value);
+		}
+		
+	 });
+	return value;
+}
 
+
+// Points Menu
+// Declare variables for the radio buttons.
+let pointRenderBtn = document.querySelector('a-button[name="selectPoints"]');
+
+// Pollution
+let polNO = document.querySelector('a-radio[label=NOx]');
+let polO3 = document.querySelector('a-radio[label=O3]');
+let polPM = document.getElementById('PM');
+let polOff = document.querySelector('a-radio[label=None]');
+
+pointRenderBtn.addEventListener('click', () => {
+	let polType;
+	let radioValue = getRadio('point-form', 'pollution');
+	console.log(`This is the radio value: ${radioValue}`);
+	switch (radioValue){
+		case 'NOx':
+			polType = 'no';
+			break;
+		case 'O3':
+			polType = 'o3';
+			break;
+		case 'PM2.5':
+			polType = 'pm';
+	}
+
+	if( radioValue == 'None'){
+		if (document.querySelectorAll("a-entity.pollution")){
+			let entities = document.querySelectorAll("a-entity.pollution");
+			let entArr = [...entities];
+			entArr.forEach(function(e){
+				e.parentNode.removeChild(e);
+			});
+		}
+	}
+	else{
+		let pollution = fetchValues('air-pollution', polType, 2018);
+		pollution.then(value => {
+    		for(var x of value.array){
+        		stylePollutionData(value.min, value.max, x);
+    		}
+		})
+
+	}
+})
