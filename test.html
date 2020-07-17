@@ -14,7 +14,7 @@
     <script src="https://cdn.rawgit.com/etiennepinchon/aframe-material/master/dist/aframe-material.min.js"></script>
     <script src="https://unpkg.com/aframe-mapbox-component/dist/aframe-mapbox-component.min.js"></script>
     <script src="https://unpkg.com/aframe-orbit-controls@1.2.0/dist/aframe-orbit-controls.min.js"></script>
-    <script src="https://unpkg.com/aframe-geometry-merger-component/dist/aframe-geometry-merger-component.min.js"></script>
+    
      
     <script src="components.js"></script>
     
@@ -33,14 +33,15 @@
         </a-assets>
 
         <!--NEW YORK CITY MODEL-->
-        <a-entity class="NYC" geometry-merger="preserveOriginal: false">
-            <a-entity id="cd1" gltf-model='#cd1' scale= "0.00168 0.00168 0.00168" position="-8.169 1 8.841" geometry='buffer: false' model-initial-settings ></a-entity>
-            <a-entity id="cd2" gltf-model='#cd2' scale= "0.00168 0.00168 0.00168" position="-8.146 1 8.846" geometry='buffer: false' model-initial-settings ></a-entity>
-            <a-entity id="cd3" gltf-model='#cd3' scale= "0.00168 0.00168 0.00168" position="-8.168 1 8.848" geometry='buffer: false' model-initial-settings ></a-entity>
-            <a-entity id="cd4" gltf-model='#cd4' scale= "0.00168 0.00168 0.00168" position="-8.160 1 8.830" geometry='buffer: false' model-initial-settings ></a-entity>
-            <a-entity id="cd5" gltf-model='#cd5' scale= "0.00168 0.00168 0.00168" position="-8.153 1 8.835" geometry='buffer: false' model-initial-settings ></a-entity>
-            <a-entity id="cd6" gltf-model='#cd6' scale= "0.00168 0.00168 0.00168" position="-8.140 1 8.835" geometry='buffer: false' model-initial-settings ></a-entity>
-        </a-entity>-->
+
+        <!--
+        <a-entity id="cd1" gltf-model='#cd1' scale= "0.00168 0.00168 0.00168" position="-8.169 1 8.841" model-initial-settings ></a-entity>
+        <a-entity id="cd2" gltf-model='#cd2' scale= "0.00168 0.00168 0.00168" position="-8.146 1 8.846" model-initial-settings ></a-entity>
+        <a-entity id="cd3" gltf-model='#cd3' scale= "0.00168 0.00168 0.00168" position="-8.168 1 8.848" model-initial-settings ></a-entity>
+        <a-entity id="cd4" gltf-model='#cd4' scale= "0.00168 0.00168 0.00168" position="-8.160 1 8.830" model-initial-settings ></a-entity>
+        <a-entity id="cd5" gltf-model='#cd5' scale= "0.00168 0.00168 0.00168" position="-8.153 1 8.835" model-initial-settings ></a-entity>
+        <a-entity id="cd6" gltf-model='#cd6' scale= "0.00168 0.00168 0.00168" position="-8.140 1 8.835" model-initial-settings ></a-entity>
+            -->
         
 
         <!--<a-entity gltf-model="#nyc" scale= "0.00168 0.00168 0.00168" position="-8.155 1 8.815" rotation="0 0 0" ></a-entity>-->
@@ -48,18 +49,20 @@
         <!--INTERACTIVE GUI-->
 
         <!-- FORM -->
-        <a-rounded position="-8 1.6 11" width="3" height="2.5" radius="0.05" rotation="0 180 0" scale="0.3 0.3 0.3">
+        <a-rounded position="-8 1.6 11" width="2.5" height="2.7" radius="0.05" rotation="0 180 0" scale = "0.3 0.3 0.3">
             <a-form>
-            <a-button position="0.2 2.2 0" width = "3.5" disabled="true" value="Data Menu"></a-button>
-            <a-button position="0.2 1.6 0" width = "3" type="raised" value="Add Point Data"></a-button>
-            <a-button position="0.2 1 0" width="3" type="raised" value="Add Embedded Data"></a-button>
-            <a-button position="0.2 0.4 0" width="3" type="raised" value="Add Value Data"></a-button>
+            <a-button position="0.11 2.3 0" width="3"  disabled="true" value="Data Menu" button-color="#a5b0c2" color="white"></a-button>
+            <a-button position="0.35 1.7 0" width="1.9" type="raised" value="Point Data"></a-button>
+            <a-button position="0.35 1.1 0"  width="1.5" type="raised" value="Embedded Data"></a-button>
+            <a-button position="0.35 0.5 0" width="1.9" type="raised" value="3D Data"></a-button>
             </a-form>
         </a-rounded>
         <!-- END FORM -->
 
         <!--ENTITIES-->
         
+        <a-plane material="color: grey" geometry="width: 50; height: 50" rotation="-90 0 0"></a-plane>
+        <!--
         <a-entity class = "mapbox"
         geometry="primitive: plane; width: 50; height: 50;"
         material="color: #ffffff; shader: flat; side: both; transparent: true;"
@@ -69,8 +72,9 @@
           pxToWorldRatio: 100;"
         position="0 1 0"
         rotation="-90 0 0"
+        -->
         
-      ></a-entity>
+      </a-entity>
         <!--CAMERA-->
         <a-entity id='camera-rig' position="-8.9 1.6 7.7" rotation="0 -180 0">
             <a-entity camera look-controls wasd-controls='fly:true'> <!--orbit-controls="target: -7.2 1.5 8.84; minDistance: 0.25; maxDistance:100; initialPosition: -8 1.2 10.25; zoomSpeed: 5"-->
