@@ -52,10 +52,25 @@
         <a-rounded position="-8 1.6 11" width="2.5" height="2.7" radius="0.05" rotation="0 180 0" scale = "0.3 0.3 0.3">
             <a-form>
             <a-button position="0.11 2.3 0" width="3"  disabled="true" value="Data Menu" button-color="#a5b0c2" color="white"></a-button>
-            <a-button position="0.35 1.7 0" width="1.9" type="raised" value="Point Data"></a-button>
-            <a-button position="0.35 1.1 0"  width="1.5" type="raised" value="Embedded Data"></a-button>
-            <a-button position="0.35 0.5 0" width="1.9" type="raised" value="3D Data"></a-button>
+            <a-button position="0.35 1.7 0" name="point-menu" width="1.9" type="raised" value="Point Data"></a-button>
+            <a-button position="0.35 1.1 0" name="embed-menu"  width="1.5" type="raised" value="Embedded Data"></a-button>
+            <a-button position="0.35 0.5 0" name="three-menu" width="1.9" type="raised" value="3D Data"></a-button>
             </a-form>
+        </a-rounded>
+
+        <a-rounded id = "point-menu" position="-8.8 1.6 11" width="4" height="2.7" radius="0.1" top-right-radius="0.3" rotation="0 180 0" scale="0.3 0.3 0.3" visible="false">
+            <a-button position="0.11 2.3 0" width="4.5"  disabled="true" value="Explore Point Datasets!" button-color="#a5b0c2" color="white"></a-button>
+            <a-entity position="1 1.5 0" text="value: hello world!;"></a-entity>
+        </a-rounded>
+
+        <a-rounded id = "embed-menu" position="-8.8 1.6 11" width="4" height="2.7" radius="0.1" top-right-radius="0.3" rotation="0 180 0" scale="0.3 0.3 0.3" visible="false">
+            <a-button position="0.11 2.3 0" width="4.5"  disabled="true" value="Explore Embedded Datasets!" button-color="#a5b0c2" color="white"></a-button>
+            <a-entity position="1 1.5 0" text="value: hello world!;"></a-entity>
+        </a-rounded>
+
+        <a-rounded id = "three-menu" position="-8.8 1.6 11" width="4" height="2.7" radius="0.1" top-right-radius="0.3" rotation="0 180 0" scale="0.3 0.3 0.3" visible="false">
+            <a-button position="0.11 2.3 0" width="4.5"  disabled="true" value="Explore 3D Datasets!" button-color="#a5b0c2" color="white"></a-button>
+            <a-entity position="1 1.5 0" text="value: hello world!;"></a-entity>
         </a-rounded>
         <!-- END FORM -->
 
