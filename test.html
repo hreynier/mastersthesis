@@ -58,28 +58,34 @@
             </a-form>
         </a-rounded>
 
-        <a-rounded id = "point-menu" position="-8.8 1.6 11" width="4" height="2.7" radius="0.1" top-right-radius="0.3" rotation="0 180 0" scale="0.3 0.3 0.3" visible="false">
-            <a-form id="point-form">
-            <a-entity position="1.5 2.3 0" text="value: Explore Point Datasets!; width: 6; align: center; height: 30;"></a-entity>
+        <a-rounded id = "three-menu" position="-6.7 1.6 11" width="4" height="2.7" radius="0.1" top-right-radius="0.3" rotation="0 180 0" scale="0.3 0.3 0.3" visible="false">
+            <a-form id="three-form">
+            <a-entity position="1.5 2.3 0" text="value: Explore 3D Datasets!; width: 6; align: center; height: 30;"></a-entity>
             <a-entity position="2.2 2 0" text="value: Pollution Datasets (2017/2018 Annual Average); width: 4;"></a-entity>
             <a-radio  position="0.2 1.7 0" name="pollution" label="NOx"></a-radio>
             <a-radio  position="1 1.7 0" name="pollution" label="O3"  ></a-radio>
             <a-radio  id="PM" position="1.8 1.7 0" name="pollution" label="PM2.5" ></a-radio>
             <a-radio  position="2.6 1.7 0" name="pollution" label="None"  ></a-radio>
 
-            <a-button position="0.2 0.2 0" name="selectPoints" width="1.9" type="raised" value="Render Data!"></a-button>
+            <a-button position="0.2 0.2 0" name="render-three" width="1.9" type="raised" value="Render Data!"></a-button>
             </a-form>
             
         </a-rounded>
 
-        <a-rounded id = "embed-menu" position="-8.8 1.6 11" width="4" height="2.7" radius="0.1" top-right-radius="0.3" rotation="0 180 0" scale="0.3 0.3 0.3" visible="false">
+        <a-rounded id = "embed-menu" position="-8.8 1.6 11" width="4" height="2.7" radius="0.1" top-left-radius="0.3" rotation="0 180 0" scale="0.3 0.3 0.3" visible="false">
+            <a-form id="embed-form">
             <a-button position="0.11 2.3 0" width="4.5"  disabled="true" value="Explore Embedded Datasets!" button-color="#a5b0c2" color="white"></a-button>
             <a-entity position="1 1.5 0" text="value: hello world!;"></a-entity>
+            </a-form>
         </a-rounded>
 
-        <a-rounded id = "three-menu" position="-8.8 1.6 11" width="4" height="2.7" radius="0.1" top-right-radius="0.3" rotation="0 180 0" scale="0.3 0.3 0.3" visible="false">
-            <a-button position="0.11 2.3 0" width="4.5"  disabled="true" value="Explore 3D Datasets!" button-color="#a5b0c2" color="white"></a-button>
-            <a-entity position="1 1.5 0" text="value: hello world!;"></a-entity>
+        <a-rounded id = "point-menu" position="-8 2.5 11" width="4" height="2.7" radius="0.1" bottom-left-radius="0.3" rotation="0 180 0" scale="0.3 0.3 0.3" visible="false">
+            <a-form id="point-form">
+            <a-entity position="1.5 2.3 0" text="value: Explore Point Datasets!; width: 6; align: center; height: 30;"></a-entity>
+            <a-checkbox position="0.2 1.9 0" width="3" name="subway" label="Show Subway Stations" checked="false"></a-checkbox>
+
+            <a-button position="0.2 0.2 0" name="render-points" width="1.9" type="raised" value="Render Data!"></a-button>
+            </a-form>
         </a-rounded>
         <!-- END FORM -->
 

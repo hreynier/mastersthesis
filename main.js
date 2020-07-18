@@ -449,9 +449,10 @@ function getRadio(form, name){
 }
 
 
-// Points Menu
+// ------ Three Menu ------ //
+//
 // Declare variables for the radio buttons.
-let pointRenderBtn = document.querySelector('a-button[name="selectPoints"]');
+let threeRenderBtn = document.querySelector('a-button[name="render-three"]');
 
 // Pollution
 let polNO = document.querySelector('a-radio[label=NOx]');
@@ -459,9 +460,9 @@ let polO3 = document.querySelector('a-radio[label=O3]');
 let polPM = document.getElementById('PM');
 let polOff = document.querySelector('a-radio[label=None]');
 
-pointRenderBtn.addEventListener('click', () => {
+threeRenderBtn.addEventListener('click', () => {
 	let polType;
-	let radioValue = getRadio('point-form', 'pollution');
+	let radioValue = getRadio('three-form', 'pollution');
 	console.log(`This is the radio value: ${radioValue}`);
 	switch (radioValue){
 		case 'NOx':
@@ -477,19 +478,75 @@ pointRenderBtn.addEventListener('click', () => {
 	if( radioValue == 'None'){
 		if (document.querySelectorAll("a-entity.pollution")){
 			let entities = document.querySelectorAll("a-entity.pollution");
-			let entArr = [...entities];
+			let entArr = [...entities]; // Turns node list into array using spread operator.
 			entArr.forEach(function(e){
 				e.parentNode.removeChild(e);
 			});
 		}
 	}
 	else{
-		let pollution = fetchValues('air-pollution', polType, 2018);
-		pollution.then(value => {
-    		for(var x of value.array){
-        		stylePollutionData(value.min, value.max, x);
-    		}
-		})
+		if (document.querySelectorAll("a-entity.pollution")){
+			let entities = document.querySelectorAll("a-entity.pollution");
+			let entArr = [...entities];
+			entArr.forEach(function(e){
+				e.parentNode.removeChild(e);
+			})
+
+			let pollution = fetchValues('air-pollution', polType, 2018);
+			pollution.then(value => {
+				for(var x of value.array){
+					stylePollutionData(value.min, value.max, x);
+    			}
+			})
+		}
+		else{
+			let pollution = fetchValues('air-pollution', polType, 2018);
+			pollution.then(value => {
+				for(var x of value.array){
+					stylePollutionData(value.min, value.max, x);
+    			}
+			})
+		}
+		
 
 	}
 })
+
+
+// ------ Point Menu ----- //
+//
+// Declare variables for the radio buttons.
+let pointRenderBtn 	= document.querySelector('a-button[name="render-points"]');
+
+let subwayStationCheckbox 	= document.querySelector('a-checkbox[name="subway"]');
+
+pointRenderBtn.addEventListener('click', () => {
+	let stationChecked = subwayStationCheckbox.getAttribute('checked');
+	if( stationChecked == 'true'){
+		console.log(`Stations are checked`);
+		if(document.body.contains(document.querySelector("a-entity.stations"))){
+			console.log(`Station entities exist.`);
+		}
+		else{
+			console.log(`Station entities do not exist. Fetching data.`);
+			getPoints('subway-stations').then(value => {
+				let renderStations = renderPoint(value, 'stations', 'box', 'red');
+				return renderStations;
+			})
+		}
+	}
+	else{
+		console.log(`The stations are not checked.`);
+		if(document.body.contains(document.querySelector("a-entity.stations"))){
+			console.log(`Entities exist - Removing.`);
+			//console.log(document.querySelectorAll("a-entity.stations"));
+			let entities = document.querySelectorAll("a-entity.stations");
+			let entArr = [...entities];
+			entArr.forEach(function(e){
+				e.parentNode.removeChild(e);
+			})
+		}
+	}
+
+})
+
