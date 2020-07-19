@@ -8,14 +8,13 @@
 // DESCRIPTION GOES HERE.
 //
 
-// Declare package imports.
-
+// 
 
 // Embeds data into 3D gltf city model.
 AFRAME.registerComponent('embed-data', {
     schema: {type: 'string', default: 'pop2010'},
     init: function () {
-        console.log("attribute set: init");
+        //console.log("attribute set: init");
         let el = this.el;
         let data = this.data;
         let colours;
@@ -176,4 +175,35 @@ AFRAME.registerComponent('model-initial-settings', {
             }
         })
     }
+});
+
+// Create on-hover component that changes size of entity and displays a given input.
+AFRAME.registerComponent('interaction-on-hover', {
+    /*schema: {
+        alterSize: {type: 'boolean', default: false},
+        input: {type: 'string'}
+    },*/
+    init: function() {
+        
+        console.log("On-Hover has been added.");
+        
+
+        /*let data = this.data;
+        let el = this.el;
+
+        let ogColor = el.getAttribute('material').color;
+        console.log(el);
+        let hovercolor = 'red';
+
+        el.addEventListener('mouseenter', () =>{
+            console.log("Mouse Entered!");
+            el.setAttribute('color', hovercolor);
+        })
+
+        el.addEventListener('mouseleave', () => {
+            console.log("Mouse Left!");
+            el.setAttribute('color', ogColor);
+        })*/
+    }
+
 });

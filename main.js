@@ -351,6 +351,14 @@ function stylePollutionData(minimum, maximum, row) {
 	obj.setAttribute('material', { color: `rgb(${colour[0]},${colour[1]}, ${colour[2]})` });
 	obj.object3D.position.set(positionX, height, positionZ);
 	obj.object3D.scale.set(size, size, size);
+	obj.setAttribute('interaction-on-hover');
+	obj.addEventListener('mouseenter', () => {
+		console.log("mouse has entered.");
+		obj.setAttribute('text', {value: value});
+	})
+	obj.addEventListener('mouseleave' , () => {
+		obj.removeAttribute('text');
+	})
 	sceneElement.appendChild(obj);
 }
 
