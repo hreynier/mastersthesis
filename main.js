@@ -211,7 +211,7 @@ async function fetchEmbeddedData(datafamily) {
 	}
 
 	let styledOut = colourEmbedded(population);
-	console.log(styledOut);
+	//console.log(styledOut);
 
 	return styledOut;
 }
@@ -435,18 +435,46 @@ threeMenuBtn.addEventListener('click', () => {
 // function to get all the radio values from a form.
 function getRadio(form, name){
 	let value;
+	let list= [];
 	// Grab list of radio buttons with the specified name.
 	let radios = document.querySelectorAll(`#${form} > [name=${name}] `);
 	Array.from(radios).forEach( function (el) {
 		let checked = el.getAttribute('checked');
+		list.push(checked);
 		if (checked == 'true'){
 			value = el.getAttribute('label');
-			console.log(value);
+			//console.log(value);
 		}
 		
-	 });
+	});
+	console.log(list);
 	return value;
 }
+
+// As there is a bug with the <a-radio> elements (They don't reset the checked status) I need to create
+// A click event that resets each other radio in the name + form.
+
+document.querySelectorAll('a-radio').forEach(item => {
+	item.addEventListener('click', () => {
+		console.log("Clicked");
+		// First, get the name of the radio group to allow to manipulate that group.
+		let radioName = item.getAttribute('name');
+		//item.setAttribute('checked', 'true');
+		document.querySelectorAll(`a-radio[name=${radioName}]`).forEach(el => {
+			el.setAttribute('checked', 'false');
+			//el.setAttribute('radioColor', "#757575");
+			//el.setAttribute('radioColorChecked', "#757575");
+		})
+		item.setAttribute('checked', 'true');
+		//item.setAttribute('radioColor', "#4076fd");
+		//item.setAttribute('radioColorChecked', "#4076fd");
+
+		document.querySelectorAll(`a-radio[name=${radioName}]`).forEach(ele =>{
+			console.log(`id: ${ele.getAttribute('label')}, checked: ${ele.getAttribute('checked')}`);
+		})
+		//console.log(`This is the radio group that was clicked: ${radioName}`);
+	})
+})
 
 
 // ------ Three Menu ------ //
@@ -476,7 +504,7 @@ threeRenderBtn.addEventListener('click', () => {
 	}
 
 	if( radioValue == 'None'){
-		if (document.querySelectorAll("a-entity.pollution")){
+		if (document.body.contains(document.querySelector("a-entity.pollution"))){
 			let entities = document.querySelectorAll("a-entity.pollution");
 			let entArr = [...entities]; // Turns node list into array using spread operator.
 			entArr.forEach(function(e){
@@ -485,7 +513,7 @@ threeRenderBtn.addEventListener('click', () => {
 		}
 	}
 	else{
-		if (document.querySelectorAll("a-entity.pollution")){
+		if (document.body.contains(document.querySelector("a-entity.pollution"))){
 			let entities = document.querySelectorAll("a-entity.pollution");
 			let entArr = [...entities];
 			entArr.forEach(function(e){
@@ -507,8 +535,6 @@ threeRenderBtn.addEventListener('click', () => {
     			}
 			})
 		}
-		
-
 	}
 })
 
@@ -523,12 +549,12 @@ let subwayStationCheckbox 	= document.querySelector('a-checkbox[name="subway"]')
 pointRenderBtn.addEventListener('click', () => {
 	let stationChecked = subwayStationCheckbox.getAttribute('checked');
 	if( stationChecked == 'true'){
-		console.log(`Stations are checked`);
+		//console.log(`Stations are checked`);
 		if(document.body.contains(document.querySelector("a-entity.stations"))){
-			console.log(`Station entities exist.`);
+			//console.log(`Station entities exist.`);
 		}
 		else{
-			console.log(`Station entities do not exist. Fetching data.`);
+			//console.log(`Station entities do not exist. Fetching data.`);
 			getPoints('subway-stations').then(value => {
 				let renderStations = renderPoint(value, 'stations', 'box', 'red');
 				return renderStations;
@@ -536,9 +562,9 @@ pointRenderBtn.addEventListener('click', () => {
 		}
 	}
 	else{
-		console.log(`The stations are not checked.`);
+		//console.log(`The stations are not checked.`);
 		if(document.body.contains(document.querySelector("a-entity.stations"))){
-			console.log(`Entities exist - Removing.`);
+			//console.log(`Entities exist - Removing.`);
 			//console.log(document.querySelectorAll("a-entity.stations"));
 			let entities = document.querySelectorAll("a-entity.stations");
 			let entArr = [...entities];
@@ -550,3 +576,73 @@ pointRenderBtn.addEventListener('click', () => {
 
 })
 
+// ------ Embed Menu ------ //
+//
+// Declare variables for the radio buttons.
+let embedRenderBtn = document.querySelector('a-button[name="render-embed"]');
+let popObj;
+
+// Click event listener.
+embedRenderBtn.addEventListener('click', () => {
+	let popType;
+	
+	let popVal = getRadio('embed-form', 'population');
+	console.log(`This is the radio value: ${popVal}`);
+
+	switch(popVal){
+		case '2000':
+			popType = 'pop2000';
+			break;
+		case '2010':
+			popType = 'pop2010';
+			break;
+		case '2000/2010 % Change':
+			popType = 'popDiff';
+			break;
+		case 'None':
+			popType = 'None';
+	}
+
+	console.log(`popType : ${popType}`);
+	if(popObj != undefined){
+		console.log(`popObj is declared: setting attribute.`)
+		let entities = document.querySelectorAll('a-entity.model');
+		let entArr = [...entities];
+		entArr.forEach(function(e){
+			if(popType == 'None'){
+				e.removeAttribute('embed-data');
+			}
+			else{
+				e.removeAttribute('embed-data');
+				e.setAttribute('embed-data', popType);
+			}
+			
+		})
+	}
+	else{
+		console.log("population object is empty - Fetching data...");
+		let popPromise = fetchEmbeddedData('population');
+		popObj = popPromise.then(value => {
+			popObj = value;
+			console.log(`popObj: ${popObj}`);
+			console.log(popObj);
+
+			let entities = document.querySelectorAll('a-entity.model');
+			let entArr = [...entities];
+			console.log(`entities: ${entArr}`);
+			console.log(entArr);
+			entArr.forEach(function(e){
+			if(popType == 'None'){
+				e.removeAttribute('embed-data');
+			}
+			else{
+				e.removeAttribute('embed-data');
+				e.setAttribute('embed-data', popType);
+			}
+			
+		});
+			return value
+		})
+		
+	}
+})

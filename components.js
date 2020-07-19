@@ -15,12 +15,14 @@
 AFRAME.registerComponent('embed-data', {
     schema: {type: 'string', default: 'pop2010'},
     init: function () {
+        console.log("attribute set: init");
         let el = this.el;
         let data = this.data;
         let colours;
+        console.log(el);
 
-        // Wait for model to load.
-        el.addEventListener('model-loaded', () => {
+        // Don't need to wait for model to load as this is applied long after the model has looaded.
+        //el.addEventListener('model-loaded', () => {
             let id = el.id;
             let district;
             console.log(`This is the id: ${id}`);
@@ -28,8 +30,8 @@ AFRAME.registerComponent('embed-data', {
             if(popObj){
                 
                 console.log(`Component object input: ${popObj}`);
-                popObj.then(value => {
-                    let inputData = value;
+                //popObj.then(value => {
+                    let inputData = popObj;
                     let col;
 
                     switch(data){
@@ -95,13 +97,15 @@ AFRAME.registerComponent('embed-data', {
                         }
                     }
 
-                })
+                //})
+                return;
 
             }
             else{
                 console.log(`The input data does not exist. This may be due to an async error.`);
+                return;
             }
-        });
+        //});
     },
     remove: function(){
         const el = this.el;
