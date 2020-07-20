@@ -179,31 +179,57 @@ AFRAME.registerComponent('model-initial-settings', {
 
 // Create on-hover component that changes size of entity and displays a given input.
 AFRAME.registerComponent('interaction-on-hover', {
-    /*schema: {
-        alterSize: {type: 'boolean', default: false},
-        input: {type: 'string'}
-    },*/
+    schema: {
+        alterSize : {type: 'boolean', default: false},
+        input: {type: 'string', default: 'ok'}
+    },
     init: function() {
+        const el = this.el;
+        const id = el.id;
+        const data = this.data;
+        let textValue = data.input
+        let alterSize = data.alterSize;
+        let camera = document.querySelector('#camera-rig');
+
+
+        //console.log(`add-text has been added to object`);
+        let txt = document.createElement('a-entity');
+        txt.setAttribute('text', {
+            'color' : 'red',
+            'align' : 'center',
+            'width': '10',
+            'value' : textValue
+        });
+        txt.setAttribute('position', '0 2 0');
+
+        let camRot = camera.object3D.rotation
+        let txtRot = (camRot._y + Math.PI);
+
+        txt.object3D.rotation.x = parseFloat(camRot._x);
+        txt.object3D.rotation.y = parseFloat(camRot._y);
+        console.log(`x: ${camRot._x}, Y: ${camRot._y}`);
         
-        console.log("On-Hover has been added.");
+       
+        el.appendChild(txt);
         
-
-        /*let data = this.data;
-        let el = this.el;
-
-        let ogColor = el.getAttribute('material').color;
-        console.log(el);
-        let hovercolor = 'red';
-
-        el.addEventListener('mouseenter', () =>{
-            console.log("Mouse Entered!");
-            el.setAttribute('color', hovercolor);
-        })
-
-        el.addEventListener('mouseleave', () => {
-            console.log("Mouse Left!");
-            el.setAttribute('color', ogColor);
-        })*/
+        if(alterSize){
+            el.object3D.scale.multiplyScalar(1.1);
+        }
+        
+    },
+    remove: function(){
+        const el = this.el;
+        const data = this.data;
+        let alterSize = data.alterSize;
+        //console.log("Child removing.")
+        //console.log(el);
+        //console.log(el.childNodes);
+        el.removeChild(el.childNodes[0]);
+        //console.log(el.getAttribute('scale'));
+        if(alterSize){
+            //console.log("size altered- revert.")
+            el.object3D.scale.divideScalar(1.1);
+        }
+        
     }
-
-});
+})

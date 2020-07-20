@@ -346,18 +346,24 @@ function stylePollutionData(minimum, maximum, row) {
 	let height = (hiHeight - loHeight) * delta + loHeight;
 
 	let obj = document.createElement('a-entity');
+
 	obj.setAttribute('class', 'pollution');
 	obj.setAttribute('geometry', 'primitive: sphere');
 	obj.setAttribute('material', { color: `rgb(${colour[0]},${colour[1]}, ${colour[2]})` });
 	obj.object3D.position.set(positionX, height, positionZ);
 	obj.object3D.scale.set(size, size, size);
-	obj.setAttribute('interaction-on-hover');
+
 	obj.addEventListener('mouseenter', () => {
 		console.log("mouse has entered.");
-		obj.setAttribute('text', {value: value});
+		obj.setAttribute('interaction-on-hover', {
+			'alterSize' : true,
+			'input': value
+		});
 	})
 	obj.addEventListener('mouseleave' , () => {
-		obj.removeAttribute('text');
+		console.log('mouse has left.')
+		obj.removeAttribute('interaction-on-hover');
+		
 	})
 	sceneElement.appendChild(obj);
 }
