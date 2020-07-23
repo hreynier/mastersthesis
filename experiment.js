@@ -2,10 +2,16 @@ let sceneEl = document.querySelector('a-scene');
 
 
 
-function createLegend(title, subtitle, side, colorObject, data, id){
+function createLegend(textObject, side, colorObject, data, id){
     /*  Creates an interactive legend in A-Frame, with customisation based on 
         input parameters.
         
+        Text Object = {
+            title: 'string',
+            subtitle: 'string',
+            min: 'float/int',
+            max: 'float/int'
+        }
         Title & Subtitle are both strings, which will be rendered as the legends title
         / subtitle. Representing the dataset and units for example.
         
@@ -26,9 +32,7 @@ function createLegend(title, subtitle, side, colorObject, data, id){
     // TO MAKE FULLY GENERIC/ABSTRACT NEED TO TAKE INTO ACCOUNT VARYING STEP SIZES,
     // NOT JUST '10'.
 
-    // Declare variables - MAY NOT BE NEEDED.
-    let titleValue      = title;
-    let subtitleValue   = subtitle;
+    // Declare variables.
     let sceneElement = document.querySelector('a-scene');
     let cameraElement = document.querySelector('[camera]');
 
@@ -41,7 +45,11 @@ function createLegend(title, subtitle, side, colorObject, data, id){
 
     // Create parent object for legend.
     let legendParent = {};
+    // position X value for background element.
     let bgX;
+    // position X value for text elements.
+    let txtX;
+    let minX;
 
     // Declare x/z A-Frame positions according to 'side' parameter.
     switch (side){
@@ -49,17 +57,22 @@ function createLegend(title, subtitle, side, colorObject, data, id){
             legendParent.x = -0.6;
             legendParent.z = -0.47;
             bgX = -0.007;
+            txtX = -0.065;
+            minX = 0.02;
+            
         break;
         case 'right':
             legendParent.x = 0.6;
             legendParent.z = -0.47;
             bgX = 0.007;
+            txtX = -0.12;
+            minX = -0.11;
     }
 
     // Create parent entity - assign position based on above.
     let parent = document.createElement('a-entity');
     parent.object3D.position.set(legendParent.x, 0, legendParent.z);
-    parent.setAttribute('id', id);
+    parent.setAttribute('id', `${id}-legend`);
     parent.setAttribute('material', {shader: 'flat'}); // Stops legend from being affected by lighting - increases clarity + performance.
 
 
@@ -132,7 +145,9 @@ function createLegend(title, subtitle, side, colorObject, data, id){
     
     // Set basic attributes.
     legendFrame.setAttribute('material', { color: 'black'});
-    legendFrame.setAttribute('geometry', {width: (gradElSize + 0.01), height: (length + (gradElSize*2))});
+    let lgdFrmWdt = (gradElSize + 0.01);
+    let lgdFrmHgt = ((gradElSize * 2) + length);
+    legendFrame.setAttribute('geometry', {width: lgdFrmWdt, height: lgdFrmHgt});
     legendFrame.object3D.position.set(bgX, 0, -0.005);
 
     // Append
@@ -144,7 +159,54 @@ function createLegend(title, subtitle, side, colorObject, data, id){
     // Add black <a-plane> bg to them.
     // Add max + min values? (possibly need to change the parameters to (TXT input)).
 
+    // Declare title, subtitle, min, max values from input object.
+    let title = textObject.title;
+    let subtitle = textObject.subtitle;
+    let min = textObject.min;
+    let max = textObject.max;
 
+    // Create text elements for each.
+    let titleEl = document.createElement('a-text');
+    let subtitEl= document.createElement('a-text');
+    let minEl   = document.createElement('a-text');
+    let maxEl   = document.createElement('a-text');
+    
+    // Set basic attributes + position for each.
+    
+    // Title
+    titleEl.setAttribute('color', 'black');
+    titleEl.setAttribute('width', 0.5 );
+    let titleY = ( ( lgdFrmHgt / 2 ) + ( 1.2 * gradElSize ) );
+    titleEl.object3D.position.set(txtX, titleY,0);
+    titleEl.setAttribute('value', title);
+
+    // Subtitle
+    subtitEl.setAttribute('color','black')
+    subtitEl.setAttribute('width', 0.3);
+    let subtitY = ( titleY - ( 0.75 * gradElSize ) );
+    subtitEl.object3D.position.set(txtX , subtitY, 0);
+    subtitEl.setAttribute('value', subtitle);
+
+    // Min
+    minEl.setAttribute('color', 'black');
+    minEl.setAttribute('width', 0.4 );
+    let minY = - ( (lgdFrmHgt / 2 ) - (gradElSize / 2));
+    
+    minEl.object3D.position.set(minX, minY, 0);
+    minEl.setAttribute('value', `Min: ${min}`);
+
+    // Max
+    maxEl.setAttribute('color', 'black');
+    maxEl.setAttribute('width', 0.4 );
+    let maxY = - minY;
+    maxEl.object3D.position.set(minX, maxY, 0);
+    maxEl.setAttribute('value', `Max: ${max}`);
+
+    // Append as children to parent element.
+    parent.appendChild(titleEl);
+    parent.appendChild(subtitEl);
+    parent.appendChild(minEl);
+    parent.appendChild(maxEl);
 
 
 
@@ -212,10 +274,24 @@ let colObject = {
     steps: 10
 };
 
-createLegend('Pollution', 'NO', 'right', colObject, 'd', 'id');
+let txtObject = {
+    title: 'Pollution (NOx)',
+    subtitle: 'ppm 2017-2018 annual avg',
+    min: '30',
+    max: '2500'
+}
+createLegend(txtObject, 'left', colObject, 'd', 'id');
 
 let obj = document.querySelector('a-box');
 let marker = document.querySelector('#id-marker');
+
+// Get marker position.
+let oldPos = marker.getAttribute('position');
+oldPos = oldPos.y;
+
+
+// Make up delta ratio.
+let delta = 0.8;
 
 obj.addEventListener('mouseenter', () =>{
     console.log('mouseenter');
@@ -225,10 +301,15 @@ obj.addEventListener('mouseenter', () =>{
     });
     obj.setAttribute('color', 'blue');
 
-    marker.setAttribute('interaction-on-hover', {
-        'alterSize' : false,
-        'input' : 'Hello there!'
+    marker.setAttribute('legend-marker-value', {
+        'input' : '40',
+        'side' : 'left'
     });
+
+    // HARD CODED length of legend.
+    let length = 11 * 0.03;
+    let newPos  = ( ( delta * length) + oldPos);
+    marker.object3D.position.set(0, newPos, 0);
 
     
     
@@ -238,6 +319,7 @@ obj.addEventListener('mouseleave', () => {
     console.log('mouse-leave');
     obj.removeAttribute('interaction-on-hover');
     obj.setAttribute('color', 'tomato');
-    marker.removeAttribute('interaction-on-hover')
+    marker.removeAttribute('legend-marker-value');
+    marker.object3D.position.set(0, oldPos, 0);
     
 })

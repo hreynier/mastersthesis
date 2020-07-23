@@ -189,7 +189,7 @@ AFRAME.registerComponent('interaction-on-hover', {
         const data = this.data;
         let textValue = data.input
         let alterSize = data.alterSize;
-        let camera = document.querySelector('#camera-rig');
+        let camera = document.querySelector('a-entity[camera]');
 
 
         //console.log(`add-text has been added to object`);
@@ -205,8 +205,9 @@ AFRAME.registerComponent('interaction-on-hover', {
         let camRot = camera.object3D.rotation
         let txtRot = (camRot._y + Math.PI);
 
-        txt.object3D.rotation.x = parseFloat(camRot._x);
+        //txt.object3D.rotation.x = parseFloat(camRot._x);
         txt.object3D.rotation.y = parseFloat(camRot._y);
+        //txt.object3D.rotation.z = parseFloat(camRot._z);
         console.log(`x: ${camRot._x}, Y: ${camRot._y}`);
         
        
@@ -230,6 +231,96 @@ AFRAME.registerComponent('interaction-on-hover', {
             //console.log("size altered- revert.")
             el.object3D.scale.divideScalar(1.1);
         }
+        
+    }
+})
+
+
+AFRAME.registerComponent('multicolored-cube', {
+    dependencies: ['geometry'],
+  
+    init: function() {
+      var mesh = this.el.getObject3D('mesh');
+      var geom = mesh.geometry;
+      for (var i = 0; i < geom.faces.length; i++) {
+        var face = geom.faces[i]; 
+        face.color.setRGB(Math.random(), Math.random(), Math.random());
+      }
+      
+      geom.colorsNeedUpdate = true;
+      mesh.material.vertexColors = THREE.FaceColors;
+    }
+});
+
+// Component that displays the input text over an element. 
+// This is adapted to suit the marker entity on the custom legend.
+// The input is a string which gets rendered.
+AFRAME.registerComponent('legend-marker-value', {
+    schema : { 
+        input: {type: 'string', default: 'placeholder'},
+        side:  {type: 'string', default: 'right'}
+    },
+
+    // Function that runs on initialisation of attribute.
+    init: function() {
+        
+        // Declare element + data variables.
+        const el = this.el;
+        const data = this.data;
+        const id = el.id;
+
+
+        // Create plane element, and add text component to it.
+        // Text holds value of the component input.
+        let txt = document.createElement('a-plane');
+        txt.setAttribute('text', {
+            'color' : 'red',
+            'align' : 'center',
+            'width': '0.4',
+            'value' : data.input
+        });
+
+        // Set plane background to black.
+        txt.setAttribute('material', 'color: black');
+        txt.setAttribute('geometry', {width: 0.05, height: 0.03});
+
+        
+        
+        // As marker is rotated about z-axis by 45 we must also position the entity
+        // in Y as well. Through trig -> it is 0.4 too.
+        let posX = 0.035
+        let posY = ( Math.tan(45 * Math.PI / 180) * Math.abs(posX));
+
+        // According to side parameter, set the position of the element.
+        // Side indicates the side of the legend (e.g legend on left-hand side of screen => side = 'left').
+        switch (data.side){
+            case 'left':
+                posX = posX + 0.027;
+                posY = -( Math.tan(45 * Math.PI / 180) * Math.abs(posX));
+                break;
+            case 'right':
+                posX = -posX;
+                posY = ( Math.tan(45 * Math.PI / 180) * Math.abs(posX));;
+        }
+        
+        txt.object3D.position.set(posX, posY, 0.001);
+        
+
+        // Set rotation to offset marker rotation.
+        let rotationZ = THREE.Math.degToRad(-45)
+        txt.object3D.rotation.z = (rotationZ);
+
+        // Append to marker element.
+        el.appendChild(txt);
+        
+    },
+    remove: function(){
+
+        //Declare constants.
+        const el = this.el;
+
+        // Remove child elements.
+        el.removeChild(el.childNodes[0]);
         
     }
 })
