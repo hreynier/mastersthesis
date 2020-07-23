@@ -213,7 +213,7 @@ async function fetchEmbeddedData(datafamily) {
 	let styledOut = colourEmbedded(population);
 	//console.log(styledOut);
 
-	return styledOut;
+	return population;
 }
 
 function colourEmbedded(dataObject) {
@@ -352,6 +352,16 @@ function stylePollutionData(minimum, maximum, row) {
 	obj.setAttribute('material', { color: `rgb(${colour[0]},${colour[1]}, ${colour[2]})` });
 	obj.object3D.position.set(positionX, height, positionZ);
 	obj.object3D.scale.set(size, size, size);
+	obj.setAttribute('delta', delta);
+	obj.setAttribute('value', value);
+
+
+	// Get the legend marker and its og position.
+	let marker = document.getElementById('pollution-marker');
+	let oldPos = marker.getAttribute('position');
+	oldPos = oldPos.y;
+
+
 
 	obj.addEventListener('mouseenter', () => {
 		console.log("mouse has entered.");
@@ -359,15 +369,322 @@ function stylePollutionData(minimum, maximum, row) {
 			'alterSize' : true,
 			'input': value
 		});
+
+		// Move marker according to ratio.
+		marker.setAttribute('legend-marker-value', {
+			'input' : value,
+			'side' : 'left'
+		});
+	
+		// HARD CODED length of legend.
+		let length = 11 * 0.03;
+
+		// new position according to ratio (delta) in dataset.
+		let newPos  = ( ( delta * length) + oldPos);
+		marker.object3D.position.set(0, newPos, 0);
+
+
 	})
 	obj.addEventListener('mouseleave' , () => {
 		console.log('mouse has left.')
 		obj.removeAttribute('interaction-on-hover');
+
+		// remove marker value and reset to og position.
+		marker.removeAttribute('legend-marker-value');
+    	marker.object3D.position.set(0, oldPos, 0);
 		
 	})
 	sceneElement.appendChild(obj);
 }
 
+//
+
+function createLegend(textObject, side, colorObject, id){
+    /*  Creates an interactive legend in A-Frame, with customisation based on 
+        input parameters.
+        
+        Text Object = {
+            title: 'string',
+            subtitle: 'string',
+            min: 'float/int',
+            max: 'float/int'
+        }
+        Title & Subtitle are both strings, which will be rendered as the legends title
+        / subtitle. Representing the dataset and units for example.
+        
+        Side indicates the position of the legend.
+        
+        colorObject is an object formatted,
+         {topColor: [R,G,B], bottomColor: [R,G,B], Steps: Integer}
+        This utilises the colorGradient function to return an array, of length according to steps,
+        containing the RGB values for a gradient from the bottom color to the top color.
+
+        The data object is the data that should be represented in the legend.
+
+        id is the id for the element.
+    */
+    
+    // NEED TO ADD REQUIRE AFRAME TO ENSURE FUNCTION ONLY RUNS IF AFRAME IS LOADED.
+
+    // TO MAKE FULLY GENERIC/ABSTRACT NEED TO TAKE INTO ACCOUNT VARYING STEP SIZES,
+    // NOT JUST '10'.
+
+	console.log("creating legend...");
+	// Declare variables.
+    let sceneElement = document.querySelector('a-scene');
+    let cameraElement = document.querySelector('[camera]');
+
+    // Blank inputs. NEED TO ADD IF USER DOES NOT ENTER CERTAIN INPUTS.
+    
+
+    // Calculate + return the color gradient array.
+	let gradient = colorGradient(colorObject.topColor, colorObject.bottomColor, colorObject.steps);
+	console.log('returning gradient...');
+	console.log(gradient);
+
+
+    // Create parent object for legend.
+    let legendParent = {};
+    // position X value for background element.
+    let bgX;
+    // position X value for text elements.
+    let txtX;
+    let minX;
+
+	// Declare x/z A-Frame positions according to 'side' parameter.
+	console.log('checking side parameter...')
+    switch (side){
+        case 'left':
+            legendParent.x = -0.6;
+            legendParent.z = -0.47;
+            bgX = -0.007;
+            txtX = -0.065;
+            minX = 0.02;
+            
+        break;
+        case 'right':
+            legendParent.x = 0.6;
+            legendParent.z = -0.47;
+            bgX = 0.007;
+            txtX = -0.12;
+            minX = -0.11;
+    }
+	console.log(`side: ${side}, posX: ${legendParent.x}`, );
+
+    // Create parent entity - assign position based on above.
+    let parent = document.createElement('a-entity');
+    parent.object3D.position.set(legendParent.x, 0, legendParent.z);
+    parent.setAttribute('id', `${id}-legend`);
+    parent.setAttribute('material', {shader: 'flat'}); // Stops legend from being affected by lighting - increases clarity + performance.
+
+
+    // ----- LEGEND COLOURS ----- //
+    // Set gradient entity parameters.
+    let gradElSize = 0.03; //Assuming desired shape is square not rectangle.
+    
+    // Grab step parameter and step unit to determine position of entity later.
+    let stepsTotal = parseInt(colorObject.steps,10);
+    let stepSize   = 1 / stepsTotal;
+    let length = stepsTotal * gradElSize;
+
+    // Loop through gradient array and create gradient-legend entities accordingly.
+    for(var i=0; i < gradient.length; i++){
+        console.log(`i: ${i}, col: ${gradient[i]}`);
+        // Grab colour from gradient array.
+        let colour = gradient[i];
+
+        // Calculate ratio of where entity is along position.
+        let posRatio = stepSize * i;
+        let position = posRatio * length;
+        let posY     = (-length/2) + position; // divided by two as legend is centered around y = 0.
+        
+
+        // Create gradient element.
+        let gradientEl = document.createElement('a-plane');
+        // Set size (smol square).
+        gradientEl.setAttribute('geometry', {width: gradElSize, height: gradElSize});
+        // Set colour.
+        gradientEl.setAttribute('material', { color: `rgb(${colour[0]}, ${colour[1]}, ${colour[2]})`});
+        // Set position.
+        gradientEl.object3D.position.set(0, posY, 0);
+        // Stops legend from being affected by lighting - increases clarity + performance.
+        gradientEl.setAttribute('material', {shader: 'flat'});
+
+        // Append to parent entity.
+        parent.appendChild(gradientEl);
+    }
+
+    // ----- MARKER ----- //    
+    // Create the marker entity.
+    let marker = document.createElement('a-entity');
+
+    // Set basic attributes.
+    marker.setAttribute('geometry', 'primitive: box');
+    marker.setAttribute('material', { color: '#787469'});
+    marker.setAttribute('geometry', {width: (gradElSize-0.01), height: (gradElSize-0.01), depth: 0.001});
+    marker.setAttribute('material', {shader: 'flat'});
+    
+    // Set position
+    // Calculate the minimum position according to the gradient elements dimensions.
+    let markerY = - (length/2) - (gradElSize/2);
+    marker.object3D.position.set(0, markerY ,0);
+
+    // Set rotation to create diamond shape.
+    let markerRotation = THREE.Math.degToRad(45)
+    marker.object3D.rotation.z = (markerRotation);
+
+    // Set marker id to allow for interaction outside of function.
+    // Through DOM manipulation. (?)
+    marker.setAttribute('id', `${id}-marker`);
+    //console.log(`marker id: ${marker.getAttribute('id')}`);
+
+    parent.appendChild(marker);
+
+    // ---- LEGEND FRAME ---- //
+
+    // Create legend frame object to incrase legend + marker clarity for certain colour combinations.
+    let legendFrame = document.createElement('a-plane');
+    
+    // Set basic attributes.
+    legendFrame.setAttribute('material', { color: 'black'});
+    let lgdFrmWdt = (gradElSize + 0.01);
+    let lgdFrmHgt = ((gradElSize * 2) + length);
+    legendFrame.setAttribute('geometry', {width: lgdFrmWdt, height: lgdFrmHgt});
+    legendFrame.object3D.position.set(bgX, 0, -0.005);
+
+    // Append
+    parent.appendChild(legendFrame);
+
+    // ---- TITLE + SUBTITLE + TXT ---- //
+
+    // Parse the title + subtitle values into two <a-text> entities and place them above the legend (leaving space.)
+    // Add black <a-plane> bg to them.
+    // Add max + min values? (possibly need to change the parameters to (TXT input)).
+
+    // Declare title, subtitle, min, max values from input object.
+    let title = textObject.title;
+    let subtitle = textObject.subtitle;
+    let min = textObject.min;
+    let max = textObject.max;
+
+    // Create text elements for each.
+    let titleEl = document.createElement('a-text');
+    let subtitEl= document.createElement('a-text');
+    let minEl   = document.createElement('a-text');
+    let maxEl   = document.createElement('a-text');
+    
+    // Set basic attributes + position for each.
+    
+    // Title
+    titleEl.setAttribute('color', 'black');
+    titleEl.setAttribute('width', 0.5 );
+    let titleY = ( ( lgdFrmHgt / 2 ) + ( 1.2 * gradElSize ) );
+    titleEl.object3D.position.set(txtX, titleY,0);
+    titleEl.setAttribute('value', title);
+
+    // Subtitle
+    subtitEl.setAttribute('color','black')
+    subtitEl.setAttribute('width', 0.3);
+    let subtitY = ( titleY - ( 0.75 * gradElSize ) );
+    subtitEl.object3D.position.set(txtX , subtitY, 0);
+    subtitEl.setAttribute('value', subtitle);
+
+    // Min
+    minEl.setAttribute('color', 'black');
+    minEl.setAttribute('width', 0.4 );
+    let minY = - ( (lgdFrmHgt / 2 ) - (gradElSize / 2));
+    
+    minEl.object3D.position.set(minX, minY, 0);
+    minEl.setAttribute('value', `Min: ${min}`);
+
+    // Max
+    maxEl.setAttribute('color', 'black');
+    maxEl.setAttribute('width', 0.4 );
+    let maxY = - minY;
+    maxEl.object3D.position.set(minX, maxY, 0);
+    maxEl.setAttribute('value', `Max: ${max}`);
+
+    // Append as children to parent element.
+    parent.appendChild(titleEl);
+    parent.appendChild(subtitEl);
+    parent.appendChild(minEl);
+    parent.appendChild(maxEl);
+
+
+
+    cameraElement.appendChild(parent);
+}
+
+function colorGradient(topColor, bottomColor, steps){
+    /*  Given two RGB colours (provided as [arrays]), create and output
+        an array of intermediary colours with a length
+        equal to the steps specified.
+    */
+    // Empty Array for output
+    let gradient = [];
+
+    // Parse the steps as number to base 10.
+    let stepsInt = parseInt(steps, 10);
+
+    // Percentage representation of the given steps. DEPRECATED.
+    let stepPerc = 100 / (stepsInt + 1);
+
+    // Decimal representation of each step.
+    let stepUnit = 1 / stepsInt;
+
+    // Calc the difference between each colour.
+
+    let diffRGB = [
+        topColor[0] - bottomColor[0],
+        topColor[1] - bottomColor[1],
+        topColor[2] - bottomColor[2]
+    ];
+
+    // Loop through each step/colour in gradient. 
+    // Calculate the RGB values based on difference + current step unit.
+    for(var i=0; i < (stepsInt+1); i++){
+        let col = [];
+
+        let delta = i * stepUnit;
+        //console.log(`Index: ${i}, Delta: ${delta}`);
+
+        for (var j = 0; j < 3; j++){
+            col[j] = parseInt((diffRGB[j]) * delta + bottomColor[j]);
+        }
+
+        // Push color to gradient.
+        
+        gradient.push(col);
+    }
+
+    // Return the final gradient object.
+
+
+    return gradient
+}
+
+// ------- CLASSES ------- //
+
+// Gradient object for creating linear color gradient arrays with
+// the colorGradient() function.
+class Gradient {
+	constructor(topColor, bottomColor, steps) {
+		this.topColor 		= topColor;
+		this.bottomColor 	= bottomColor;
+		this.steps 			= steps;
+	}
+}
+
+// LegendLabels object for labelling the custom legend using the 
+// createLegend() function.
+class LegendLabels {
+	constructor(title, subtitle, min, max) {
+		this.title 		= title;
+		this.subtitle 	= subtitle;
+		this.min 		= min;
+		this.max 		= max;
+	}
+}
 
 
 
@@ -490,6 +807,31 @@ document.querySelectorAll('a-radio').forEach(item => {
 	})
 })
 
+// ------ Color Schemes for Legends ----- //
+
+// Yellow -> Red (used in pollution bubbles.)
+let yellow 	= [255, 255, 153];
+let red 	= [255, 80, 80];
+let stepNo 	= 10;
+
+let ylwRed 	= new Gradient(red, yellow, stepNo);
+console.log(`ylwRed object:`);
+console.log(ylwRed);
+console.log(ylwRed.bottomColor);
+
+let ylwrdGradient = colorGradient(ylwRed.topColor, ylwRed.bottomColor, ylwRed.steps);
+
+// White -> Blue (used in embedded population data.)
+let white 	= [222, 235, 247];
+let blue 	= [50, 134, 195];
+
+let whtBlu	= new Gradient(white, blue, stepNo);
+
+let wtbluGradient 	= colorGradient(whtBlu.topColor, whtBlu.bottomColor, whtBlu.steps);
+
+// CREATE MORE GRADIENTS HERE.
+
+
 
 // ------ Three Menu ------ //
 //
@@ -506,15 +848,23 @@ threeRenderBtn.addEventListener('click', () => {
 	let polType;
 	let radioValue = getRadio('three-form', 'pollution');
 	console.log(`This is the radio value: ${radioValue}`);
+	let title;
+	let subtitle;
 	switch (radioValue){
 		case 'NOx':
 			polType = 'no';
+			title = 'Annual Avg Nitric Oxide';
+			subtitle = 'Dec 2017-Dec 2018, (ppb)';
 			break;
 		case 'O3':
 			polType = 'o3';
+			title = 'Summer Avg Ozone';
+			subtitle = 'Jun - Aug 2018, (ppb)';
 			break;
 		case 'PM2.5':
 			polType = 'pm';
+			title = 'Annual Avg fine \n particulate matter';
+			subtitle = 'Dec 2017-Dec 2018, (ug/m3)';
 	}
 
 	if( radioValue == 'None'){
@@ -524,6 +874,8 @@ threeRenderBtn.addEventListener('click', () => {
 			entArr.forEach(function(e){
 				e.parentNode.removeChild(e);
 			});
+			// QUERY DOCUMENT VIA ID FOR PARENT ENTITY OF LEGEND AND REMOVE FROM SCENE.
+			
 		}
 	}
 	else{
@@ -534,19 +886,40 @@ threeRenderBtn.addEventListener('click', () => {
 				e.parentNode.removeChild(e);
 			})
 
+			// QUERY DOCUMENT VIA ID FOR PARENT ENTITY OF LEGEND AND REMOVE FROM SCENE.
+
+			let oldLegend = document.getElementById(`${polType}-legend`);
+
+
 			let pollution = fetchValues('air-pollution', polType, 2018);
 			pollution.then(value => {
 				for(var x of value.array){
 					stylePollutionData(value.min, value.max, x);
-    			}
+				}
+				// CREATE TEXT OBJECT + COLOR OBJECT + CREATE LEGEND THROUGH THESE OBJECTS.
+				
+				let legendText = new LegendLabels(title, subtitle, value.min, value.max);
+
+				createLegend(legendText, 'left', ylwRed, 'pollution');
+
+
 			})
 		}
 		else{
 			let pollution = fetchValues('air-pollution', polType, 2018);
 			pollution.then(value => {
+
+				// CREATE TEXT OBJECT + COLOR OBJECT + CREATE LEGEND THROUGH THESE OBJECTS.
+				let legendText = new LegendLabels(title, subtitle, value.min, value.max);
+				
+				
+				createLegend(legendText, 'left', ylwRed, 'pollution');
+
+
 				for(var x of value.array){
 					stylePollutionData(value.min, value.max, x);
-    			}
+				}
+				
 			})
 		}
 	}
@@ -636,8 +1009,9 @@ embedRenderBtn.addEventListener('click', () => {
 	else{
 		console.log("population object is empty - Fetching data...");
 		let popPromise = fetchEmbeddedData('population');
-		popObj = popPromise.then(value => {
-			popObj = value;
+		popPromise.then(value => {
+			popObj = colourEmbedded(value);
+			// NEEED TO CHANGE THIS ALL TO GRAB THE PROCESSED DATA BEFORE STYLING HERE RATHER IN FUNCTION.
 			console.log(`popObj: ${popObj}`);
 			console.log(popObj);
 
