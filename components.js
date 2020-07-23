@@ -282,7 +282,7 @@ AFRAME.registerComponent('legend-marker-value', {
 
         // Set plane background to black.
         txt.setAttribute('material', 'color: black');
-        txt.setAttribute('geometry', {width: 0.05, height: 0.03});
+        txt.setAttribute('geometry', {width: 0.06, height: 0.03});
 
         
         
