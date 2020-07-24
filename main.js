@@ -466,8 +466,8 @@ function createLegend(textObject, side, colorObject, id){
             legendParent.x = 0.6;
             legendParent.z = -0.47;
             bgX = 0.007;
-            txtX = -0.12;
-            minX = -0.11;
+            txtX = -0.2;
+            minX = -0.13;
     }
 	console.log(`side: ${side}, posX: ${legendParent.x}`, );
 
@@ -825,7 +825,7 @@ let ylwrdGradient = colorGradient(ylwRed.topColor, ylwRed.bottomColor, ylwRed.st
 let white 	= [222, 235, 247];
 let blue 	= [50, 134, 195];
 
-let whtBlu	= new Gradient(white, blue, stepNo);
+let whtBlu	= new Gradient(blue, white, stepNo);
 
 let wtbluGradient 	= colorGradient(whtBlu.topColor, whtBlu.bottomColor, whtBlu.steps);
 
@@ -833,7 +833,7 @@ let wtbluGradient 	= colorGradient(whtBlu.topColor, whtBlu.bottomColor, whtBlu.s
 
 
 
-// ------ Three Menu ------ //
+// ------ Three/Bubble Menu ------ //
 //
 // Declare variables for the radio buttons.
 let threeRenderBtn = document.querySelector('a-button[name="render-three"]');
@@ -964,20 +964,35 @@ threeRenderBtn.addEventListener('click', () => {
 
 // ------ Point Menu ----- //
 //
-// Declare variables for the radio buttons.
+// Grab the render button for the points.
 let pointRenderBtn 	= document.querySelector('a-button[name="render-points"]');
 
+// Grab the checkboxes for each point variable.
 let subwayStationCheckbox 	= document.querySelector('a-checkbox[name="subway"]');
 
+// Add event listener to render button, in order to fetch data + render data on user interaction.
 pointRenderBtn.addEventListener('click', () => {
+
+	// Store values of checkboxes for each datapoints.
 	let stationChecked = subwayStationCheckbox.getAttribute('checked');
+
+	// If the metro station checkbox was checked ->
+	// query document body for existing entities, and
+	// if none exist, create them + render.
+	// If checkbox is not checked, remove entities if they exist.
 	if( stationChecked == 'true'){
-		//console.log(`Stations are checked`);
+
+		// Querying document body for instance of 'station' entity.
 		if(document.body.contains(document.querySelector("a-entity.stations"))){
-			//console.log(`Station entities exist.`);
+			
+			// As checkbox is checked+entities exist, do nothing as job is done.
 		}
+		// Entities do not exist, so fetch data and then render.
 		else{
 			//console.log(`Station entities do not exist. Fetching data.`);
+
+			// Fetch data for metro stations, then once the promise
+			// resolves, render the data with the point renderer function.
 			getPoints('subway-stations').then(value => {
 				let renderStations = renderPoint(value, 'stations', 'box', 'red');
 				return renderStations;
@@ -986,9 +1001,11 @@ pointRenderBtn.addEventListener('click', () => {
 	}
 	else{
 		//console.log(`The stations are not checked.`);
+
 		if(document.body.contains(document.querySelector("a-entity.stations"))){
 			//console.log(`Entities exist - Removing.`);
-			//console.log(document.querySelectorAll("a-entity.stations"));
+
+			// Store node list of all metro station entities + spread into array to remove.
 			let entities = document.querySelectorAll("a-entity.stations");
 			let entArr = [...entities];
 			entArr.forEach(function(e){
@@ -999,68 +1016,174 @@ pointRenderBtn.addEventListener('click', () => {
 
 })
 
-// ------ Embed Menu ------ //
+// ------ Embedded Menu ------ //
 //
-// Declare variables for the radio buttons.
+// Grab the render button for the embedded data menu.
 let embedRenderBtn = document.querySelector('a-button[name="render-embed"]');
-let popObj;
 
-// Click event listener.
+// Declare variables for the population/embedded data object,
+// as this will be called across different components here and in components.js
+// CHANGE NAME TO BE MORE GENERIC
+let popObj;
+let popPromise;
+
+// Add click even listener.
 embedRenderBtn.addEventListener('click', () => {
+
+	// Declare population type variable.
 	let popType;
+
+	// Declare min+max, title+subtitle variables for the legend labels.
+	let labelMin;
+	let labelMax;
+	let title;
+	let subtitle;
 	
+	// Get the radio button values using the 'getRadio' function.
+	// NEED TO CHANGE FROM POPULATION TO EMBEDDED AS IT WILL BE GENERIC.
 	let popVal = getRadio('embed-form', 'population');
+
+	// Log the selected value.
 	console.log(`This is the radio value: ${popVal}`);
 
+	// Switch expression that takes the radio input
+	// and assigns the relevant value to popType so that
+	// the correct data can be fetched through the API.
 	switch(popVal){
 		case '2000':
 			popType = 'pop2000';
+			labelMin= 'min00';
+			labelMax= 'max00';
+			title   = 'Total Population (2000)';
+			subtitle= 'per Community District (in Ks)';
 			break;
 		case '2010':
 			popType = 'pop2010';
+			labelMin= 'min10';
+			labelMax= 'max10';
+			title   = 'Total Population (2010)';
+			subtitle= 'per Community District (in Ks)';
 			break;
 		case '2000/2010 % Change':
 			popType = 'popDiff';
+			labelMin= 'minDiff';
+			labelMax= 'maxDiff';
+			title   = 'Population Change';
+			subtitle= '(2000/2010) in %';
 			break;
 		case 'None':
 			popType = 'None';
 	}
 
+	// Log the final popType
 	console.log(`popType : ${popType}`);
+
+	// If the embedded data object does exist,
+	// no need to fetch data again.
 	if(popObj != undefined){
-		console.log(`popObj is declared: setting attribute.`)
+		console.log(`embedded data object already exists: setting attribute.`);
+		
+
+		// As the data object exists, it can be assumed that data has been displayed already.
+		// POSSIBLY CHANGE TO IF STATEMENT?
+		// In which case, need to remove component and re-assign.
+		// CAN REDUCE COMPUTATION BY CHECKING WHETHER SAME COMPONENT ALREADY ASSIGNED.
+
+		// Query the document body for all instances of the city model.
 		let entities = document.querySelectorAll('a-entity.model');
+		// Transform node list into loopable array.
 		let entArr = [...entities];
-		entArr.forEach(function(e){
-			if(popType == 'None'){
-				e.removeAttribute('embed-data');
-			}
-			else{
-				e.removeAttribute('embed-data');
-				e.setAttribute('embed-data', popType);
-			}
+
+		// resolve the embedded data promise to access the values.
+		popPromise.then( value =>  {
 			
+			// Firstly, create new label object for the legend.
+			let labels =  new LegendLabels(title, subtitle, value[labelMin], value[labelMax]);
+
+			// Loop through each model, and if the input is set to 'None'
+			// remove the component.
+			//If the input is valid, need to assign component
+			// through new attribute.
+			entArr.forEach(function(e){
+				if(popType == 'None'){
+					// If document body contains instances of embedded legend, remove legend + attribute.
+					if(document.body.contains(document.querySelector("#embedded-legend"))){
+						e.removeAttribute('embed-data');
+						let legend = document.getElementById('embedded-legend');
+						legend.parentNode.removeChild(legend);
+					}
+				}
+				else{
+					// If document body contains instances of embedded legend, remove legend + attribute.
+					if(document.body.contains(document.querySelector("#embedded-legend"))){
+						e.removeAttribute('embed-data');
+						let legend = document.getElementById('embedded-legend');
+						legend.parentNode.removeChild(legend);
+					}
+
+					// Create legend + apply styling.
+					createLegend(labels, 'right', whtBlu,'embedded');
+					e.setAttribute('embed-data', popType);
+				}
+			
+			})
 		})
+		
 	}
+	
+	// if the embedded data object does not exist, we must fetch the data.
 	else{
 		console.log("population object is empty - Fetching data...");
-		let popPromise = fetchEmbeddedData('population');
-		popPromise.then(value => {
-			popObj = colourEmbedded(value);
-			// NEEED TO CHANGE THIS ALL TO GRAB THE PROCESSED DATA BEFORE STYLING HERE RATHER IN FUNCTION.
-			console.log(`popObj: ${popObj}`);
-			console.log(popObj);
 
+		// Declare promise for the data object, selecting the population family.
+		popPromise = fetchEmbeddedData('population');
+
+		// Once promise is resolved, style the data.
+		popPromise.then(value => {
+			
+			// Firstly, create new label object for the legend.
+			let labels = new LegendLabels(title, subtitle, value[labelMin], value[labelMax]);
+
+			// Create new legend entity with the labels object + colour object created earlier
+			// 'whtBlu'
+			createLegend(labels, 'right', whtBlu,'embedded');
+			
+			// Return a styled array of the dataset.
+			popObj = colourEmbedded(value);
+
+			// Select all model entities, and if the selected radio value
+			// is equal to 'None' remove all styling+legend.
+			// If not, apply styling and add the legend.
 			let entities = document.querySelectorAll('a-entity.model');
 			let entArr = [...entities];
-			console.log(`entities: ${entArr}`);
-			console.log(entArr);
+
+			//console.log(`entities: ${entArr}`);
+			//console.log(entArr);
+
+			// Loop through each model.
 			entArr.forEach(function(e){
 			if(popType == 'None'){
-				e.removeAttribute('embed-data');
+
+				// If document body contains instances of embedded legend, remove legend + attribute.
+				if(document.body.contains(document.querySelector("#embedded-legend"))){
+					e.removeAttribute('embed-data');
+					let legend = document.getElementById('embedded-legend');
+					legend.parentNode.removeChild(legend);
+				}
+				// If no instances, as the data object doesnt exist, there must not be any 
+				// styling or attributes/legends to remove.
 			}
 			else{
-				e.removeAttribute('embed-data');
+
+				// If document body contains instances of embedded legend, remove legend + attribute.
+				if(document.body.contains(document.querySelector("#embedded-legend"))){
+					e.removeAttribute('embed-data');
+					let legend = document.getElementById('embedded-legend');
+					legend.parentNode.removeChild(legend);
+				}
+
+				// Create legend + apply styling.
+				createLegend(labels, 'right', whtBlu,'embedded');
 				e.setAttribute('embed-data', popType);
 			}
 			
