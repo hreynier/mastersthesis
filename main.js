@@ -839,17 +839,33 @@ let wtbluGradient 	= colorGradient(whtBlu.topColor, whtBlu.bottomColor, whtBlu.s
 let threeRenderBtn = document.querySelector('a-button[name="render-three"]');
 
 // Pollution
+
+// Get the radio buttion elements for each pollution type.
 let polNO = document.querySelector('a-radio[label=NOx]');
 let polO3 = document.querySelector('a-radio[label=O3]');
 let polPM = document.getElementById('PM');
 let polOff = document.querySelector('a-radio[label=None]');
 
+// Add event listener to the 'Render Button'
+// This will allow us to fetch the necessary data + render it alongside UI elements.
 threeRenderBtn.addEventListener('click', () => {
+
+	// Declare variables to store the values of the radio button.
 	let polType;
+
+	// Get the value of the radio button using the getRadio function declared earlier.
 	let radioValue = getRadio('three-form', 'pollution');
+
+	// Log it for debugging purposes.
 	console.log(`This is the radio value: ${radioValue}`);
+
+	// Create variables for the switch expression.
+	// These store the values for legend entity that will be created later
+	// , based on the radio input.
 	let title;
 	let subtitle;
+
+	// Switch expression for radio value (pollution).
 	switch (radioValue){
 		case 'NOx':
 			polType = 'no';
@@ -867,59 +883,79 @@ threeRenderBtn.addEventListener('click', () => {
 			subtitle = 'Dec 2017-Dec 2018, (ug/m3)';
 	}
 
+	// If the radio value for pollution is set to 'None' query document for
+	// any associated entities and if they exist remove them.
+	// if not just continue.
+
 	if( radioValue == 'None'){
 		if (document.body.contains(document.querySelector("a-entity.pollution"))){
+
+			// Get all instances of 'pollution' entities.
 			let entities = document.querySelectorAll("a-entity.pollution");
 			let entArr = [...entities]; // Turns node list into array using spread operator.
 			entArr.forEach(function(e){
 				e.parentNode.removeChild(e);
 			});
-			// QUERY DOCUMENT VIA ID FOR PARENT ENTITY OF LEGEND AND REMOVE FROM SCENE.
-			
+
+
+			// Grab the legend entity for pollution and remove from scene.
+			let legend = document.getElementById('pollution-legend');
+			legend.parentNode.removeChild(legend);
 		}
 	}
+
+	// If the radio value for pollution is NOT 'None', check if any entities exist already. If so, 
+	// remove them and call the render function again.
+	// This can be improved by checking whether the new type
+	// is the same as the old type to prevent unnecessary re-fetching + re-rendering
+	// of data + entities.
 	else{
 		if (document.body.contains(document.querySelector("a-entity.pollution"))){
+
+			// Get all instances of 'pollution' entities, and remove.
 			let entities = document.querySelectorAll("a-entity.pollution");
 			let entArr = [...entities];
 			entArr.forEach(function(e){
 				e.parentNode.removeChild(e);
 			})
 
-			// QUERY DOCUMENT VIA ID FOR PARENT ENTITY OF LEGEND AND REMOVE FROM SCENE.
+			// Grab the legend entity for pollution and remove from scene.
+			let legend = document.getElementById('pollution-legend');
+			legend.parentNode.removeChild(legend);
 
-			let oldLegend = document.getElementById(`${polType}-legend`);
 
-
+			// After scene has been reset - fetch new data and re-render using the style functions.
 			let pollution = fetchValues('air-pollution', polType, 2018);
+
+			// After promise is resolved (and data is received), render data + legend.
 			pollution.then(value => {
+
+				// First, generate new lables objects from resolved promise' value.
+				let legendText = new LegendLabels(title, subtitle, value.min, value.max);
+
+				// Create a new legend entity using the label object and color object previously generated
+				// (and matching the colors of the rendered data.)
+				// It's important to create the legend first as the rendered points 
+				// interacts with the legend.
+				createLegend(legendText, 'left', ylwRed, 'pollution'); //Left-oriented legend, with id = 'pollution-legend';
+				
+				// Now we can loop through data array and render the bubbles.
 				for(var x of value.array){
 					stylePollutionData(value.min, value.max, x);
 				}
-				// CREATE TEXT OBJECT + COLOR OBJECT + CREATE LEGEND THROUGH THESE OBJECTS.
-				
-				let legendText = new LegendLabels(title, subtitle, value.min, value.max);
-
-				createLegend(legendText, 'left', ylwRed, 'pollution');
-
-
 			})
 		}
+
+		// If there were no other pollution entities present, fetch the data and render as usual.
 		else{
 			let pollution = fetchValues('air-pollution', polType, 2018);
 			pollution.then(value => {
 
-				// CREATE TEXT OBJECT + COLOR OBJECT + CREATE LEGEND THROUGH THESE OBJECTS.
 				let legendText = new LegendLabels(title, subtitle, value.min, value.max);
-				
-				
 				createLegend(legendText, 'left', ylwRed, 'pollution');
-
-
 				for(var x of value.array){
 					stylePollutionData(value.min, value.max, x);
 				}
-				
 			})
 		}
 	}
