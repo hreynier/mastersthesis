@@ -210,7 +210,7 @@ async function fetchEmbeddedData(datafamily) {
 		data: resultArr
 	}
 
-	let styledOut = colourEmbedded(population);
+	//let styledOut = colourEmbedded(population);
 	//console.log(styledOut);
 
 	return population;
@@ -1108,18 +1108,18 @@ embedRenderBtn.addEventListener('click', () => {
 				if(popType == 'None'){
 					// If document body contains instances of embedded legend, remove legend + attribute.
 					if(document.body.contains(document.querySelector("#embedded-legend"))){
-						e.removeAttribute('embed-data');
 						let legend = document.getElementById('embedded-legend');
 						legend.parentNode.removeChild(legend);
 					}
+					e.removeAttribute('embed-data');
 				}
 				else{
 					// If document body contains instances of embedded legend, remove legend + attribute.
 					if(document.body.contains(document.querySelector("#embedded-legend"))){
-						e.removeAttribute('embed-data');
 						let legend = document.getElementById('embedded-legend');
 						legend.parentNode.removeChild(legend);
 					}
+					e.removeAttribute('embed-data');
 
 					// Create legend + apply styling.
 					createLegend(labels, 'right', whtBlu,'embedded');
@@ -1162,32 +1162,34 @@ embedRenderBtn.addEventListener('click', () => {
 
 			// Loop through each model.
 			entArr.forEach(function(e){
-			if(popType == 'None'){
+				if(popType == 'None'){
 
-				// If document body contains instances of embedded legend, remove legend + attribute.
-				if(document.body.contains(document.querySelector("#embedded-legend"))){
+					// If document body contains instances of embedded legend, remove legend + attribute.
+					if(document.body.contains(document.querySelector("#embedded-legend"))){
+						
+						let legend = document.getElementById('embedded-legend');
+						legend.parentNode.removeChild(legend);
+					}
 					e.removeAttribute('embed-data');
-					let legend = document.getElementById('embedded-legend');
-					legend.parentNode.removeChild(legend);
+					// If no instances, as the data object doesnt exist, there must not be any 
+					// styling or attributes/legends to remove.
 				}
-				// If no instances, as the data object doesnt exist, there must not be any 
-				// styling or attributes/legends to remove.
-			}
-			else{
+				else{
 
-				// If document body contains instances of embedded legend, remove legend + attribute.
-				if(document.body.contains(document.querySelector("#embedded-legend"))){
+					// If document body contains instances of embedded legend, remove legend + attribute.
+					if(document.body.contains(document.querySelector("#embedded-legend"))){
+						
+						let legend = document.getElementById('embedded-legend');
+						legend.parentNode.removeChild(legend);
+					}
 					e.removeAttribute('embed-data');
-					let legend = document.getElementById('embedded-legend');
-					legend.parentNode.removeChild(legend);
-				}
 
-				// Create legend + apply styling.
-				createLegend(labels, 'right', whtBlu,'embedded');
-				e.setAttribute('embed-data', popType);
-			}
+					// Create legend + apply styling.
+					createLegend(labels, 'right', whtBlu,'embedded');
+					e.setAttribute('embed-data', popType);
+				}
 			
-		});
+			});
 			return value
 		})
 		

@@ -11,100 +11,222 @@
 // 
 
 // Embeds data into 3D gltf city model.
+// Colors the model based on the input variable.
+// Also creates an interactive entity above each district
+// that on mouse-hover shows the user the embedded data and
+// updates the legend.
+
 AFRAME.registerComponent('embed-data', {
     schema: {type: 'string', default: 'pop2010'},
     init: function () {
-        //console.log("attribute set: init");
+        
+        // Declare constants for entity + input data.
         let el = this.el;
         let data = this.data;
         let colours;
-        console.log(el);
+
+        let sceneEl = document.querySelector('a-scene');
+
+        //console.log(el);
 
         // Don't need to wait for model to load as this is applied long after the model has looaded.
-        //el.addEventListener('model-loaded', () => {
-            let id = el.id;
-            let district;
-            console.log(`This is the id: ${id}`);
+        // Declare variables for each district + entity id;
+        let id = el.id;
+        let district;
+        //console.log(`This is the id: ${id}`);
+
+        // Declare variables for min/max + data (to calculate ratio for marker);
+        let min;
+        let max;
+        let pointCol;
+        let pointRow;
+
+        // Create position variables for the interactive box entity
+        // that is created later.
+        //Grab the 3d models position;
+        let interactorX = -8.169;
+        let interactorZ = 8.841;
+
+        let baseColor = [127, 135, 148];
+        
+        
+        if(popObj){
             
-            if(popObj){
-                
-                console.log(`Component object input: ${popObj}`);
-                //popObj.then(value => {
-                    let inputData = popObj;
-                    let col;
+            //console.log(`Component object input: ${popObj}`);
 
-                    switch(data){
-                        case 'pop2000':
-                            col = inputData.pop00;
-                            break;
+            // Grab embedded data promise and resolve to access values.
+            popPromise.then(value => {
+
+                // Declare blank variables for the colour objects + column numbe
+                // for determine correct column based on entity id.
+                let inputData = popObj;
+                let col;
+
+                // Switch expression that parses the input data to determine what 
+                // colours + data are used.
+                switch(data){
+                    case 'pop2000':
+                        col = inputData.pop00;
+                        min = value.min00;
+                        max = value.max00;
+                        pointCol = 1;
+                        break;
+                    
+                    case 'pop2010':
+                        col = inputData.pop10;
+                        min = value.min10;
+                        max = value.max10;
+                        pointCol = 2;
+                        break;
+                    case 'popDiff':
+                        col = inputData.popDiff;
+                        min = value.minDiff;
+                        max = value.maxDiff;
+                        pointCol = 3;
+
+                }
+
+                // Second switch to determine what district to apply the colours to.
+                switch(id){
+                    case 'cd1':
+                        district=0;
+                        colours = col[district];
+                        pointRow = value.data[0];
                         
-                        case 'pop2010':
-                            col = inputData.pop10;
-                            break;
-                        case 'popDiff':
-                            col = inputData.popDiff;
+                        break;
+                    case 'cd2':
+                        district=1;
+                        colours = col[district];
+                        pointRow = value.data[1];
+                        interactorX = -7;
+                        interactorZ = 4.5;
+                        break;
+                    case 'cd3':
+                        district=2;
+                        colours = col[district];
+                        pointRow = value.data[2];
+                        interactorX = -4;
+                        interactorZ = 5.5;
+                        break;
+                    case 'cd4':
+                        district=3;
+                        colours = col[district];
+                        pointRow = value.data[3];
+                        interactorX = -7;
+                        interactorZ = 1;
+                        break;
+                    case 'cd5':
+                        district=4;
+                        colours = col[district];
+                        pointRow = value.data[4];
+                        interactorX = -5;
+                        interactorZ = 1.5;
+                        break;
+                    case 'cd6':
+                        district=5;
+                        colours = col[district];
+                        pointRow = value.data[5];
+                        interactorX = -3;
+                        interactorZ = 2;
+                }
 
-                    }
+                console.log(`col: ${pointCol}, row: ${pointRow}`);
+                console.log(pointRow);
 
-                    switch(id){
-                        case 'cd1':
-                            district=0;
-                            colours = col[district];
+                // Create new variable to grab district data.
+                let embedData = pointRow[pointCol];
+                console.log(`embedded data: ${embedData}`);
+                // Calculate the ratio between the data and the rest of the dataset.
+                let delta = (embedData - min) / (max - min);
+
+                // Create new interactive entity.
+                let interactor = document.createElement('a-box');
+
+                
+                // Set Attributes for color, size, position etc.
+                interactor.setAttribute('id', `box-${id}`);
+                interactor.setAttribute('material', { color: `rgb(${baseColor[0]},${baseColor[1]}, ${baseColor[2]})` });
+                interactor.object3D.position.set(interactorX, 2, interactorZ);
+                console.log(interactor.getAttribute('position'));
+                interactor.object3D.scale.set(0.2, 0.2, 0.2);
+                
+
+                // Grab the marker element and store its position.
+                let marker = document.getElementById('embedded-marker');
+                let oldPos = marker.getAttribute('position');
+                oldPos = oldPos.y;
+
+                // Grab the mesh/scene.
+                const obj = el.getObject3D('mesh');
+
+                // Append interactor to scene.
+                sceneEl.appendChild(interactor);
+
+                // Add event listener
+                interactor.addEventListener('mouseenter', () => {
+                    console.log("mouse has entered.");
+
+                    interactor.setAttribute('interaction-on-hover', {
+                        'alterSize' : true,
+                        'input': embedData
+                    });
+
+                    marker.setAttribute('legend-marker-value', {
+                        'input': embedData,
+                        'side': 'right'
+                    })
+
+                    // HARD CODED length of legend.
+		            let length = 11 * 0.03;
+
+		            // new position according to ratio (delta) in dataset.
+		            let newPos  = ( ( delta * length) + oldPos);
+		            marker.object3D.position.set(0, newPos, 0);
+
+                })
+                // Remove attributes on mouse-leave.
+                interactor.addEventListener('mouseleave' , () => {
+                    console.log('mouse has left.')
+                    interactor.removeAttribute('interaction-on-hover');
+            
+                    // remove marker value and reset to og position.
+                    marker.removeAttribute('legend-marker-value');
+                    marker.object3D.position.set(0, oldPos, 0);
+                    
+                })
+
+                if(id == 'cd1'){
+                    for(row of obj.children){
+                        for(x of row.children){
+
+                            x.addEventListener('mouseenter', () => {
+                                console.log("mouse has entered.");
+        
+                            })
                             
-                            break;
-                        case 'cd2':
-                            district=1;
-                            colours = col[district];
-                            break;
-                        case 'cd3':
-                            district=2;
-                            colours = col[district];
-                            break;
-                        case 'cd4':
-                            district=3;
-                            colours = col[district];
-                            break;
-                        case 'cd5':
-                            district=4;
-                            colours = col[district];
-                            break;
-                        case 'cd6':
-                            district=5;
-                            colours = col[district];
-                    }
-
-                    //console.log(`colors: ${colours[0]}`);
-
-                    // Grab the mesh/scene.
-                    const obj = el.getObject3D('mesh');
-
-                    if(id == 'cd1'){
-                        for(row of obj.children){
-                            for(x of row.children){
-                                
-                                x.material.color.set(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
-                            }
+                            x.material.color.set(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
                         }
                     }
-                    else{
-                        for(x of obj.children){
-                            //console.log(x);
-                            if(x.material){
-                                
-                                x.material.color.set(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
-                            }
+                }
+                else{
+                    for(x of obj.children){
+                        //console.log(x);
+                        if(x.material){
+                            
+                            x.material.color.set(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
                         }
                     }
+                }
 
-                //})
-                return;
+            })
+            return;
 
-            }
-            else{
-                console.log(`The input data does not exist. This may be due to an async error.`);
-                return;
-            }
-        //});
+        }
+        else{
+            console.log(`The input data does not exist. This may be due to an async error.`);
+            return;
+        }
+        
     },
     remove: function(){
         const el = this.el;
@@ -114,7 +236,9 @@ AFRAME.registerComponent('embed-data', {
         let baseColor = [127, 135, 148];
 
 
-        
+        let interactor = document.getElementById(`box-${id}`);
+
+        interactor.parentNode.removeChild(interactor);
 
         if(id == 'cd1'){
             for(row of obj.children){
