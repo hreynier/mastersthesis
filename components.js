@@ -142,14 +142,30 @@ AFRAME.registerComponent('embed-data', {
                 // Create new interactive entity.
                 let interactor = document.createElement('a-box');
 
+                let interactorEntity = document.createElement('a-box');
+
                 
                 // Set Attributes for color, size, position etc.
                 interactor.setAttribute('id', `box-${id}`);
+                interactorEntity.setAttribute('id', `boxEnt-${id}`);
                 interactor.setAttribute('material', { color: `rgb(${baseColor[0]},${baseColor[1]}, ${baseColor[2]})` });
-                interactor.object3D.position.set(interactorX, 4, interactorZ);
-                console.log(interactor.getAttribute('position'));
+                interactor.object3D.position.set(interactorX, 3.5, interactorZ);
+                interactorEntity.object3D.position.set(interactorX, 3.5, interactorZ);
+                interactorEntity.object3D.scale.set(0.2, 0.2, 0.2);
                 interactor.object3D.scale.set(0.5, 0.5, 0.5);
-                
+
+                // Create rotating animation entity to attach to interactor box
+                // so that the user can easily see the interactor.
+                interactor.setAttribute('animation', { property: 'rotation', dur: '7000', to: '0 360 0', loop: 'true', easing: 'linear'});
+              
+
+                /*let boxLabel = document.createElement('a-text');
+                boxLabel.object3D.position.set(0, 0, 0.25);
+                boxLabel.setAttribute('color', 'red');
+                boxLabel.setAttribute('width', 0.5);
+                boxLabel.setAttribute('value', 'Click me!');
+
+                interactor.appendChild(boxLabel);*/
 
                 // Grab the marker element and store its position.
                 let marker = document.getElementById('embedded-marker');
@@ -161,6 +177,7 @@ AFRAME.registerComponent('embed-data', {
 
                 // Append interactor to scene.
                 sceneEl.appendChild(interactor);
+                sceneEl.appendChild(interactorEntity);
 
                 // Add event listener
                 interactor.addEventListener('mouseenter', () => {
@@ -168,8 +185,14 @@ AFRAME.registerComponent('embed-data', {
 
                     interactor.setAttribute('interaction-on-hover', {
                         'alterSize' : true,
-                        'input': embedData
+                        'input': '  '
                     });
+
+                    interactorEntity.setAttribute('interaction-on-hover', {
+                        'alterSize': false,
+                        'input': embedData,
+                        'textWidth': '22'
+                    })
 
                     marker.setAttribute('legend-marker-value', {
                         'input': embedData,
@@ -188,6 +211,7 @@ AFRAME.registerComponent('embed-data', {
                 interactor.addEventListener('mouseleave' , () => {
                     console.log('mouse has left.')
                     interactor.removeAttribute('interaction-on-hover');
+                    interactorEntity.removeAttribute('interaction-on-hover');
             
                     // remove marker value and reset to og position.
                     marker.removeAttribute('legend-marker-value');
@@ -237,8 +261,10 @@ AFRAME.registerComponent('embed-data', {
 
 
         let interactor = document.getElementById(`box-${id}`);
+        let interactorEntity = document.getElementById(`boxEnt-${id}`);
 
         interactor.parentNode.removeChild(interactor);
+        interactorEntity.parentNode.removeChild(interactorEntity);
 
         if(id == 'cd1'){
             for(row of obj.children){
