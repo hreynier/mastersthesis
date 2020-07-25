@@ -61,7 +61,7 @@ async function getPoints(pointType) {
 	let longitude;
 	let location;
 	let dataName;
-	let dataValue;
+	let Names = [];
 	let posX = [];
 	let posZ = [];
 	let posY = [];
@@ -114,24 +114,26 @@ async function getPoints(pointType) {
 				posY.push(positionY);
 				let row = [positionX, positionY, positionZ];
 				posXYZ.push(row);
+				Names.push(dataName);
 			}
 		}
 	}
 	let position = {
-		xyz: posXYZ
+		xyz: posXYZ,
+		name: Names
 	}
 	return position;
 }
 
 function renderPoint(positionObject, elementClass, geom, col) {
 
-	for (let [index, entry] of Object.entries(positionObject)) {
-		//console.log(`index: ${index}, value: ${entry}`);
-		for (let [ind, ent] of Object.entries(entry)) {
-			//console.log(`ind: ${ind}, Row : ${ent}`);
-			let posX = parseFloat(ent[0]);
-			let posY = parseFloat(ent[1]);
-			let posZ = parseFloat(ent[2]);
+	for (let [index, entry] of Object.entries(positionObject.xyz)) {
+		console.log(`index: ${index}, value: ${entry}`);
+			let posX = parseFloat(entry[0]);
+			let posY = parseFloat(entry[1]);
+			let posZ = parseFloat(entry[2]);
+			let name = positionObject.name;
+			name = name[index];
 
 			console.log(`posX: ${posX}, Y: ${posY}, Z: ${posZ}`);
 
@@ -140,14 +142,26 @@ function renderPoint(positionObject, elementClass, geom, col) {
 			pointEl.setAttribute('class', elementClass);
 			pointEl.setAttribute('position', { x: posX, y: posY, z: posZ });
 			pointEl.setAttribute('material', { color: col });
-			pointEl.setAttribute('geometry', { primitive: geom, width: 1, height: 1, depth: 1 });
-			pointEl.setAttribute('scale', { x: 0.02, y: 5, z: 0.02 }); // Hard-coded - need to implement update method.
+			pointEl.setAttribute('geometry', { primitive: geom, width: 0.02, height: 4, depth: 0.02 });
+			//pointEl.setAttribute('scale', { x: 0.02, y: 5, z: 0.02 }); // Hard-coded - need to implement update method.
 			//console.log(`Element: ${ind}`);
 
 
-			sceneElement.appendChild(pointEl);
+			// Add mouse-enter event listener to show the name of point.
+			pointEl.addEventListener('mouseenter', () => {
+				
+				pointEl.setAttribute('interaction-on-hover', {
+					'alterSize' : true,
+					'input': name
+				})
 
-		}
+			})
+
+			pointEl.addEventListener('mouseleave', () => {
+				pointEl.removeAttribute('interaction-on-hover');
+			})
+
+			sceneElement.appendChild(pointEl);
 	}
 
 }
@@ -896,7 +910,6 @@ threeRenderBtn.addEventListener('click', () => {
 			entArr.forEach(function(e){
 				e.parentNode.removeChild(e);
 			});
-
 
 			// Grab the legend entity for pollution and remove from scene.
 			let legend = document.getElementById('pollution-legend');
