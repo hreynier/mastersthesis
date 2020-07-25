@@ -159,13 +159,24 @@ AFRAME.registerComponent('embed-data', {
                 interactor.setAttribute('animation', { property: 'rotation', dur: '7000', to: '0 360 0', loop: 'true', easing: 'linear'});
               
 
-                /*let boxLabel = document.createElement('a-text');
-                boxLabel.object3D.position.set(0, 0, 0.25);
-                boxLabel.setAttribute('color', 'red');
-                boxLabel.setAttribute('width', 0.5);
-                boxLabel.setAttribute('value', 'Click me!');
+                let interactorLabel1 = document.createElement('a-text');
+                interactorLabel1.object3D.position.set(0, 0, 0.5);
+                interactorLabel1.setAttribute('color', 'red');
+                interactorLabel1.setAttribute('width', 5);
+                interactorLabel1.setAttribute('align', 'center');
+                interactorLabel1.setAttribute('value', `District : ${district+1}`);
 
-                interactor.appendChild(boxLabel);*/
+                interactor.appendChild(interactorLabel1);
+
+                let interactorLabel2 = document.createElement('a-text');
+                interactorLabel2.object3D.position.set(0, 0, -0.5);
+                interactorLabel2.object3D.rotation.y = parseFloat(Math.PI);
+                interactorLabel2.setAttribute('color', 'red');
+                interactorLabel2.setAttribute('width', 5);
+                interactorLabel2.setAttribute('align', 'center');
+                interactorLabel2.setAttribute('value', `District : ${district+1}`);
+
+                interactor.appendChild(interactorLabel2);
 
                 // Grab the marker element and store its position.
                 let marker = document.getElementById('embedded-marker');
@@ -354,6 +365,7 @@ AFRAME.registerComponent('interaction-on-hover', {
             'width': textWidth,
             'value' : textValue
         });
+        txt.setAttribute('id', `txt-${id}`);
         txt.setAttribute('position', '0 2 0');
 
         let camRot = camera.object3D.rotation
@@ -376,11 +388,15 @@ AFRAME.registerComponent('interaction-on-hover', {
     remove: function(){
         const el = this.el;
         const data = this.data;
+        const id = el.id;
         let alterSize = data.alterSize;
+
+        let txt = document.getElementById(`txt-${id}`);
+        console.log(txt);
         //console.log("Child removing.")
         //console.log(el);
         //console.log(el.childNodes);
-        el.removeChild(el.childNodes[0]);
+        txt.parentNode.removeChild(txt);
         //console.log(el.getAttribute('scale'));
         if(alterSize){
             //console.log("size altered- revert.")
