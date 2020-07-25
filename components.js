@@ -305,13 +305,17 @@ AFRAME.registerComponent('model-initial-settings', {
 AFRAME.registerComponent('interaction-on-hover', {
     schema: {
         alterSize : {type: 'boolean', default: false},
-        input: {type: 'string', default: 'ok'}
+        input: {type: 'string', default: 'ok'}, 
+        textWidth : {type: 'string', default: '10'},
+        color: {type: 'string', default: 'red'}
     },
     init: function() {
         const el = this.el;
         const id = el.id;
         const data = this.data;
-        let textValue = data.input
+        let textValue = data.input;
+        let textWidth = data.textWidth;
+        let textColor = data.color;
         let alterSize = data.alterSize;
         let camera = document.querySelector('a-entity[camera]');
 
@@ -319,9 +323,9 @@ AFRAME.registerComponent('interaction-on-hover', {
         //console.log(`add-text has been added to object`);
         let txt = document.createElement('a-entity');
         txt.setAttribute('text', {
-            'color' : 'red',
+            'color' : textColor,
             'align' : 'center',
-            'width': '10',
+            'width': textWidth,
             'value' : textValue
         });
         txt.setAttribute('position', '0 2 0');

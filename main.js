@@ -151,8 +151,10 @@ function renderPoint(positionObject, elementClass, geom, col) {
 			pointEl.addEventListener('mouseenter', () => {
 				
 				pointEl.setAttribute('interaction-on-hover', {
-					'alterSize' : true,
-					'input': name
+					'alterSize' : false,
+					'input': name,
+					'textWidth': '3',
+					'color': '#d19d11'
 				})
 
 			})
