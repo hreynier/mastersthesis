@@ -1055,14 +1055,14 @@ embedRenderBtn.addEventListener('click', () => {
 			labelMin= 'min00';
 			labelMax= 'max00';
 			title   = 'Total Population (2000)';
-			subtitle= 'per Community District (in Ks)';
+			subtitle= 'per Community District';
 			break;
 		case '2010':
 			popType = 'pop2010';
 			labelMin= 'min10';
 			labelMax= 'max10';
 			title   = 'Total Population (2010)';
-			subtitle= 'per Community District (in Ks)';
+			subtitle= 'per Community District';
 			break;
 		case '2000/2010 % Change':
 			popType = 'popDiff';
