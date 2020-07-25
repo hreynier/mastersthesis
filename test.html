@@ -60,7 +60,7 @@
 
         <a-rounded id = "three-menu" position="-6.7 1.6 11" width="4" height="2.7" radius="0.1" top-right-radius="0.3" rotation="0 180 0" scale="0.3 0.3 0.3" visible="false">
             <a-form id="three-form">
-            <a-entity position="1.5 2.3 0" text="value: Explore 3D Datasets!; width: 6; align: center; height: 30;"></a-entity>
+            <a-entity position="1.5 2.3 0" text="value: Explore Bubble Datasets!; width: 6; align: center; height: 30;"></a-entity>
             <a-entity position="2.2 2 0" text="value: Pollution Datasets (2017/2018 Annual Average); width: 4;"></a-entity>
             <a-radio  position="0.2 1.7 0" name="pollution" label="NOx"></a-radio>
             <a-radio  position="1 1.7 0" name="pollution" label="O3"  ></a-radio>
@@ -77,9 +77,13 @@
             <a-entity position="1.5 2.3 0" text="value: Explore Embedded Datasets!; width: 6; align: center; height: 30;"></a-entity>
             <a-entity position="2.2 2 0" text="value: Population Datasets (Aggregated at Community District lvl); width: 4;"></a-entity>
             <a-radio position="0.2 1.7 0" name="population" label="2000"></a-radio>
-            <a-radio position="1 1.7 0" name="population" label="2010"></a-radio>
-            <a-radio position="1.8 1.7 0" name="population" label="2000/2010 % Change"></a-radio>
-            <a-radio position="2.6 1.7 0" name="population" label="None"></a-radio>
+            <a-radio position="1.2 1.7 0" name="population" label="2010"></a-radio>
+            <a-radio position="2.4 1.7 0" name="population" label="2000/2010 % Change"></a-radio>
+            <a-entity position="2.2 1.2 0" text="value: Economic Datasets (Aggregated at Community District lvl); width: 4;"></a-entity>
+            <a-radio position="0.2 0.9 0" name="population" label="Income"></a-radio>
+            <a-radio position="1.2 0.9 0" name="population" label="Total Employed"></a-radio>
+            <a-radio position="2.4 0.9 0" name="population" label="Employment %"></a-radio>
+            <a-radio position="2.4 0.5 0" name="population" label="None"></a-radio>
 
             <a-button position ="0.2 0.2 0" name="render-embed" width="1.9" type="raised" value="Render Data!"></a-button>
 

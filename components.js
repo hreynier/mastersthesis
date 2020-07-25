@@ -83,7 +83,24 @@ AFRAME.registerComponent('embed-data', {
                         min = value.minDiff;
                         max = value.maxDiff;
                         pointCol = 3;
-
+                        break;
+                    case 'income':
+                        col = inputData.inc;
+                        min = value.minInc;
+                        max = value.maxInc;
+                        pointCol = 4;
+                        break;
+                    case 'employment':
+                        col = inputData.emp;
+                        min = value.minEmp;
+                        max = value.maxEmp;
+                        pointCol = 5;
+                        break;
+                    case 'emplPerc':
+                        col = inputData.empPerc;
+                        min = value.minEmpPerc;
+                        max = value.maxEmpPerc;
+                        pointCol = 6;
                 }
 
                 // Second switch to determine what district to apply the colours to.

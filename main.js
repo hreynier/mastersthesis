@@ -179,6 +179,13 @@ async function fetchEmbeddedData(datafamily) {
 	let pop10Max = Number.MIN_VALUE;
 	let popDiffMin = Number.MAX_VALUE;
 	let popDiffMax = Number.MIN_VALUE;
+	let incMin 		= Number.MAX_VALUE;
+	let incMax 		= Number.MIN_VALUE;
+	let empMin 		= Number.MAX_VALUE;
+	let empMax 		= Number.MIN_VALUE;
+	let empPerMin 		= Number.MAX_VALUE;
+	let empPerMax 		= Number.MIN_VALUE;
+
 	let resultArr = [];
 
 
@@ -191,6 +198,9 @@ async function fetchEmbeddedData(datafamily) {
 		let population2000 = parseInt(obj.pop2000);
 		let population2010 = parseInt(obj.pop2010);
 		let populationChange = parseFloat(obj.popChange);
+		let income 			= parseFloat(obj.medInc);
+		let employment 		= parseFloat(obj.emp);
+		let employmentPercent= parseFloat(obj.empPerc);
 		//console.log(`lat: ${lat}, lon: ${lon}, type: ${typeof(lon)}`);
 		if (population2000 > pop00Max) {
 			pop00Max = population2000;
@@ -213,7 +223,28 @@ async function fetchEmbeddedData(datafamily) {
 			popDiffMin = populationChange;
 		}
 
-		let array = [distName, population2000, population2010, populationChange];
+		if (income > incMax) {
+			incMax = income;
+		}
+		if (income < incMin) {
+			incMin = income;
+		}
+
+		if (employment > empMax) {
+			empMax = employment;
+		}
+		if (employment < empMin) {
+			empMin = employment;
+		}
+
+		if (employmentPercent > empPerMax) {
+			empPerMax = employmentPercent;
+		}
+		if (employmentPercent < empPerMin) {
+			empPerMin = employmentPercent;
+		}
+
+		let array = [distName, population2000, population2010, populationChange, income, employment, employmentPercent];
 		resultArr.push(array);
 	}
 
@@ -224,6 +255,12 @@ async function fetchEmbeddedData(datafamily) {
 		max10: pop10Max,
 		minDiff: popDiffMin,
 		maxDiff: popDiffMax,
+		minInc: incMin,
+		maxInc: incMax,
+		minEmp: empMin,
+		maxEmp: empMax,
+		minEmpPerc: empPerMin,
+		maxEmpPerc: empPerMax,
 		data: resultArr
 	}
 
@@ -247,40 +284,68 @@ function colourEmbedded(dataObject) {
 	let minDiff = dataObject.minDiff;
 	let maxDiff = dataObject.maxDiff;
 
+	let minInc = dataObject.minInc;
+	let maxInc  = dataObject.maxInc;
+
+	let minEmp = dataObject.minEmp;
+	let maxEmp = dataObject.maxEmp;
+
+	let minEmpPerc = dataObject.minEmpPerc;
+	let maxEmpPerc = dataObject.maxEmpPerc;
+
 	let array = dataObject.data;
 
 	let district = [];
 	let style00 = [];
 	let style10 = [];
 	let styleDiff = [];
+	let styleInc	= [];
+	let styleEmp	= [];
+	let styleEmpPerc =[];
 
 	for (x of array) {
 
 		let delta00 = (x[1] - min00) / (max00 - min00);
 		let delta10 = (x[2] - min10) / (max10 - min10);
 		let deltaDiff = (x[3] - minDiff) / (maxDiff - minDiff);
+		let deltaInc  = (x[4] - minInc) / (maxInc - minInc);
+		let deltaEmp  = (x[5] - minEmp) / (maxEmp - minEmp);
+		let deltaEmpPerc = (x[6] - minEmpPerc) / (maxEmpPerc - minEmpPerc);
 
 		//	Assign colour based on ratio between min and max datum, and thus min and max color.
 		let colour00 = [];
 		let colour10 = [];
 		let colourDiff = [];
+		let colourInc = [];
+		let colourEmp = [];
+		let colourEmpPerc = [];
 
 		for (var i = 0; i < 3; i++) {
 			colour00[i] = parseInt((hiCol[i] - loCol[i]) * delta00 + loCol[i]);
 			colour10[i] = parseInt((hiCol[i] - loCol[i]) * delta10 + loCol[i]);
 			colourDiff[i] = parseInt((hiCol[i] - loCol[i]) * deltaDiff + loCol[i]);
+			colourInc[i] = parseInt((hiCol[i] - loCol[i]) * deltaInc + loCol[i]);
+			colourEmp[i] = parseInt((hiCol[i] - loCol[i]) * deltaEmp + loCol[i]);
+			colourEmpPerc[i] = parseInt((hiCol[i] - loCol[i]) * deltaEmpPerc + loCol[i]);
 		}
 
 		district.push(x[0]);
 		style00.push(colour00);
 		style10.push(colour10);
 		styleDiff.push(colourDiff);
+		styleInc.push(colourInc);
+		styleEmp.push(colourEmp);
+		styleEmpPerc.push(colourEmpPerc);
 	}
 	const styleObject = {
 		district: district,
 		pop00: style00,
 		pop10: style10,
-		popDiff: styleDiff
+		popDiff: styleDiff,
+		inc: styleInc,
+		emp: styleEmp,
+		empPerc: styleEmpPerc
+
 	};
 
 	return styleObject
@@ -1145,6 +1210,27 @@ embedRenderBtn.addEventListener('click', () => {
 			labelMax= 'maxDiff';
 			title   = 'Population Change';
 			subtitle= '(2000/2010) in %';
+			break;
+		case 'Income':
+			popType = 'income';
+			labelMin = 'minInc';
+			labelMax = 'maxInc';
+			title = 'Median Household Income';
+			subtitle = 'in $ (2018)';
+			break;
+		case 'Total Employed':
+			popType = 'employment';
+			labelMin = 'minEmp';
+			labelMax = 'maxEmp';
+			title = 'Total NO. Employed';
+			subtitle = 'per CD, (2018)';
+			break;
+		case 'Employment %':
+			popType = 'emplPerc';
+			labelMin = 'minEmpPerc';
+			labelMax = 'maxEmpPerc';
+			title = 'Employment %';
+			subtitle = 'of the working population (2018)';
 			break;
 		case 'None':
 			popType = 'None';
