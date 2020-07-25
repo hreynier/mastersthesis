@@ -25,6 +25,7 @@ import bearing from '@turf/bearing'
 // Declare globals
 const mapCenter = [-73.953294, 40.756234];
 const sceneElement = document.querySelector('a-scene');
+const cameraEl 		= document.querySelector('a-entity[camera]');
 
 // Declare global arrays + objects
 let station_object = [];
@@ -447,11 +448,7 @@ function createLegend(textObject, side, colorObject, id){
 
 	console.log("creating legend...");
 	// Declare variables.
-    let sceneElement = document.querySelector('a-scene');
     let cameraElement = document.querySelector('[camera]');
-
-    // Blank inputs. NEED TO ADD IF USER DOES NOT ENTER CERTAIN INPUTS.
-    
 
     // Calculate + return the color gradient array.
 	let gradient = colorGradient(colorObject.topColor, colorObject.bottomColor, colorObject.steps);
@@ -803,7 +800,8 @@ function getRadio(form, name){
 
 document.querySelectorAll('a-radio').forEach(item => {
 	item.addEventListener('click', () => {
-		console.log("Clicked");
+		//console.log("Clicked");
+		
 		// First, get the name of the radio group to allow to manipulate that group.
 		let radioName = item.getAttribute('name');
 		//item.setAttribute('checked', 'true');
@@ -916,6 +914,19 @@ threeRenderBtn.addEventListener('click', () => {
 			// Grab the legend entity for pollution and remove from scene.
 			let legend = document.getElementById('pollution-legend');
 			legend.parentNode.removeChild(legend);
+
+			// Create toast element to inform user of what happened.
+			let toast = document.createElement('a-toast');
+			toast.setAttribute('message', 'Pollution data has been removed.');
+			toast.setAttribute('action', 'Got it!');
+			toast.setAttribute('duration', 3500);
+			
+			toast.addEventListener('actionclick', () => {
+				toast.parentNode.removeChild(toast);
+			})
+			
+			cameraEl.appendChild(toast);
+			
 		}
 	}
 
@@ -958,6 +969,30 @@ threeRenderBtn.addEventListener('click', () => {
 				for(var x of value.array){
 					stylePollutionData(value.min, value.max, x);
 				}
+
+				// Create toast element to inform user of what happened.
+				let toast = document.createElement('a-toast');
+				toast.setAttribute('message', 'Pollution data added.');
+				toast.setAttribute('action', 'Got it!');
+				toast.setAttribute('duration', 2000);
+
+				let toast1 = document.createElement('a-toast');
+				toast1.setAttribute('message', 'Hover over elements to display values.');
+				toast1.setAttribute('action', 'Got it!');
+				toast1.setAttribute('duration', 3500);
+			
+				toast.addEventListener('actionclick', () => {
+					toast.parentNode.removeChild(toast);
+				})
+
+				toast1.addEventListener('actionclick', () => {
+					toast1.parentNode.removeChild(toast1);
+				})
+			
+				cameraEl.appendChild(toast);
+				setTimeout( () => {
+					cameraEl.appendChild(toast1);
+				}, 5000);
 			})
 		}
 
@@ -971,6 +1006,31 @@ threeRenderBtn.addEventListener('click', () => {
 				for(var x of value.array){
 					stylePollutionData(value.min, value.max, x);
 				}
+
+				// Create toast element to inform user of what happened.
+				let toast = document.createElement('a-toast');
+				toast.setAttribute('message', 'Pollution data added.');
+				toast.setAttribute('action', 'Got it!');
+				toast.object3D.position.set(0, 0, 0.01);
+				toast.setAttribute('duration', 2000);
+
+				let toast1 = document.createElement('a-toast');
+				toast1.setAttribute('message', 'Hover over elements to display values!');
+				toast1.setAttribute('action', 'Got it!');
+				toast1.setAttribute('duration', 3500);
+			
+				toast.addEventListener('actionclick', () => {
+					toast.parentNode.removeChild(toast);
+				})
+
+				toast1.addEventListener('actionclick', () => {
+					toast1.parentNode.removeChild(toast1);
+				})
+			
+				cameraEl.appendChild(toast);
+				setTimeout( () => {
+					cameraEl.appendChild(toast1);
+				}, 5000);
 			})
 		}
 	}
@@ -1139,6 +1199,8 @@ embedRenderBtn.addEventListener('click', () => {
 					// Create legend + apply styling.
 					createLegend(labels, 'right', whtBlu,'embedded');
 					e.setAttribute('embed-data', popType);
+
+					
 				}
 			
 			})
@@ -1202,8 +1264,33 @@ embedRenderBtn.addEventListener('click', () => {
 					// Create legend + apply styling.
 					createLegend(labels, 'right', whtBlu,'embedded');
 					e.setAttribute('embed-data', popType);
-				}
-			
+
+					// Create toast element to inform user of what happened.
+					let toast = document.createElement('a-toast');
+					toast.setAttribute('message', 'Embedded data added.');
+					toast.setAttribute('action', 'Got it!');
+					toast.object3D.position.set(0, 0, 0.01);
+					toast.setAttribute('duration', 2000);
+
+					let toast1 = document.createElement('a-toast');
+					toast1.setAttribute('message', 'Hover over the boxes above each district to display data!');
+					toast1.setAttribute('action', 'Got it!');
+					toast1.setAttribute('duration', 4000);
+				
+					toast.addEventListener('actionclick', () => {
+						toast.parentNode.removeChild(toast);
+					})
+
+					toast1.addEventListener('actionclick', () => {
+						toast1.parentNode.removeChild(toast1);
+					})
+				
+					cameraEl.appendChild(toast);
+					setTimeout( () => {
+						cameraEl.appendChild(toast1);
+					}, 5000);
+					}
+				
 			});
 			return value
 		})
