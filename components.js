@@ -146,9 +146,9 @@ AFRAME.registerComponent('embed-data', {
                 // Set Attributes for color, size, position etc.
                 interactor.setAttribute('id', `box-${id}`);
                 interactor.setAttribute('material', { color: `rgb(${baseColor[0]},${baseColor[1]}, ${baseColor[2]})` });
-                interactor.object3D.position.set(interactorX, 2, interactorZ);
+                interactor.object3D.position.set(interactorX, 4, interactorZ);
                 console.log(interactor.getAttribute('position'));
-                interactor.object3D.scale.set(0.2, 0.2, 0.2);
+                interactor.object3D.scale.set(0.5, 0.5, 0.5);
                 
 
                 // Grab the marker element and store its position.
@@ -330,9 +330,10 @@ AFRAME.registerComponent('interaction-on-hover', {
         let txtRot = (camRot._y + Math.PI);
 
         //txt.object3D.rotation.x = parseFloat(camRot._x);
-        txt.object3D.rotation.y = parseFloat(camRot._y);
+        txt.object3D.rotation.y = parseFloat(Math.PI+camRot._y);
         //txt.object3D.rotation.z = parseFloat(camRot._z);
         console.log(`x: ${camRot._x}, Y: ${camRot._y}`);
+        console.log(`Inverse Rot: ${txtRot}`);
         
        
         el.appendChild(txt);
