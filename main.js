@@ -1044,6 +1044,7 @@ threeRenderBtn.addEventListener('click', () => {
 				let toast1 = document.createElement('a-toast');
 				toast1.setAttribute('message', 'Hover over elements to display values.');
 				toast1.setAttribute('action', 'Got it!');
+				toast1.setAttribute('width', 0.7);
 				toast1.setAttribute('duration', 3500);
 			
 				toast.addEventListener('actionclick', () => {
@@ -1359,8 +1360,9 @@ embedRenderBtn.addEventListener('click', () => {
 					toast.setAttribute('duration', 2000);
 
 					let toast1 = document.createElement('a-toast');
-					toast1.setAttribute('message', 'Hover over the boxes above each district to display data!');
+					toast1.setAttribute('message', 'Interact with the boxes!');
 					toast1.setAttribute('action', 'Got it!');
+					toast1.setAttribute('width', 2);
 					toast1.setAttribute('duration', 4000);
 				
 					toast.addEventListener('actionclick', () => {
