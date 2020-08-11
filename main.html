@@ -51,10 +51,10 @@
         <!-- FORM -->
         <a-rounded position="-8 1.6 11" width="2.5" height="2.7" radius="0.05" rotation="0 180 0" scale = "0.3 0.3 0.3">
             <a-form>
-            <a-button position="0.11 2.3 0" width="3"  disabled="true" value="Data Menu" button-color="#a5b0c2" color="white"></a-button>
+            <a-entity position="1.2 2.3 0" text="value: Select Data Type; width: 6; align: center; height: 30;"></a-entity>
             <a-button position="0.35 1.7 0" name="point-menu" width="1.9" type="raised" value="Point Data"></a-button>
             <a-button position="0.35 1.1 0" name="embed-menu"  width="1.5" type="raised" value="Embedded Data"></a-button>
-            <a-button position="0.35 0.5 0" name="three-menu" width="1.9" type="raised" value="3D Data"></a-button>
+            <a-button position="0.35 0.5 0" name="three-menu" width="1.9" type="raised" value="Bubble Data"></a-button>
             </a-form>
         </a-rounded>
 
@@ -62,7 +62,7 @@
             <a-form id="three-form">
             <a-entity position="1.5 2.3 0" text="value: Explore Bubble Datasets!; width: 6; align: center; height: 30;"></a-entity>
             <a-entity position="2.2 2 0" text="value: Pollution Datasets (2017/2018 Annual Average); width: 4;"></a-entity>
-            <a-radio  position="0.2 1.7 0" name="pollution" label="NOx"></a-radio>
+            <a-radio  position="0.2 1.7 0" name="pollution" label="NO"></a-radio>
             <a-radio  position="1 1.7 0" name="pollution" label="O3"  ></a-radio>
             <a-radio  id="PM" position="1.8 1.7 0" name="pollution" label="PM2.5" ></a-radio>
             <a-radio  position="2.6 1.7 0" name="pollution" label="None"  ></a-radio>
@@ -74,7 +74,7 @@
 
         <a-rounded id = "embed-menu" position="-8.8 1.6 11" width="4" height="2.7" radius="0.1" top-left-radius="0.3" rotation="0 180 0" scale="0.3 0.3 0.3" visible="false">
             <a-form id="embed-form">
-            <a-entity position="1.5 2.3 0" text="value: Explore Embedded Datasets!; width: 6; align: center; height: 30;"></a-entity>
+            <a-entity position="1.7 2.4 0" text="value: Explore Embedded Datasets!; width: 5.5; align: center; height: 30;"></a-entity>
             <a-entity position="2.2 2 0" text="value: Population Datasets (Aggregated at Community District lvl); width: 4;"></a-entity>
             <a-radio position="0.2 1.7 0" name="population" label="2000"></a-radio>
             <a-radio position="1.2 1.7 0" name="population" label="2010"></a-radio>
