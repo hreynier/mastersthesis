@@ -2,13 +2,12 @@
 // ---- AUTHOR: Harvey Reynier --- //
 // ------- DESCRIPTION ------- //
 
+// This script containst the custom components created
+// for the NYC VR data explorer. 
+// These components are used to add interaction and styling
+// to the rendered data points
 
 
-
-// DESCRIPTION GOES HERE.
-//
-
-// 
 
 // Embeds data into 3D gltf city model.
 // Colors the model based on the input variable.
@@ -147,18 +146,21 @@ AFRAME.registerComponent('embed-data', {
                         interactorZ = 2;
                 }
 
-                console.log(`col: ${pointCol}, row: ${pointRow}`);
-                console.log(pointRow);
+                // Debugging
+                //console.log(`col: ${pointCol}, row: ${pointRow}`);
+                //console.log(pointRow);
 
                 // Create new variable to grab district data.
                 let embedData = pointRow[pointCol];
-                console.log(`embedded data: ${embedData}`);
+
+                //console.log(`embedded data: ${embedData}`);
                 // Calculate the ratio between the data and the rest of the dataset.
                 let delta = (embedData - min) / (max - min);
 
                 // Create new interactive entity.
                 let interactor = document.createElement('a-box');
 
+                // Create smaller entity that will fit inside the rotating interactor box.
                 let interactorEntity = document.createElement('a-box');
 
                 
@@ -175,7 +177,7 @@ AFRAME.registerComponent('embed-data', {
                 // so that the user can easily see the interactor.
                 interactor.setAttribute('animation', { property: 'rotation', dur: '7000', to: '0 360 0', loop: 'true', easing: 'linear'});
               
-
+                // Create text element to append to the rotating box.
                 let interactorLabel1 = document.createElement('a-text');
                 interactorLabel1.object3D.position.set(0, 0, 0.5);
                 interactorLabel1.setAttribute('color', 'red');
@@ -185,6 +187,7 @@ AFRAME.registerComponent('embed-data', {
 
                 interactor.appendChild(interactorLabel1);
 
+                // Create second text element to append to other side of rotating box.
                 let interactorLabel2 = document.createElement('a-text');
                 interactorLabel2.object3D.position.set(0, 0, -0.5);
                 interactorLabel2.object3D.rotation.y = parseFloat(Math.PI);
@@ -207,7 +210,9 @@ AFRAME.registerComponent('embed-data', {
                 sceneEl.appendChild(interactor);
                 sceneEl.appendChild(interactorEntity);
 
-                // Add event listener
+                // Add event listener that upon hovering on the rotating box, causes the rotating box to grow in size
+                // and the smaller box to display the embedded data above the rotating box.
+                // This also moves the marker appropriately.
                 interactor.addEventListener('mouseenter', () => {
                     console.log("mouse has entered.");
 
@@ -247,24 +252,23 @@ AFRAME.registerComponent('embed-data', {
                     
                 })
 
+                // Community District 1 model has a slightly different structure to the rest of the models, so we need to 
+                // parse through two sets of arrays. 
                 if(id == 'cd1'){
                     for(row of obj.children){
                         for(x of row.children){
-
-                            x.addEventListener('mouseenter', () => {
-                                console.log("mouse has entered.");
-        
-                            })
                             
+                            // Set the colour of the district according to the embedded dataset.
                             x.material.color.set(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
                         }
                     }
                 }
                 else{
                     for(x of obj.children){
-                        //console.log(x);
+            
                         if(x.material){
-                            
+
+                            // Set the colour of the district according to the embedded dataset.
                             x.material.color.set(`rgb(${colours[0]}, ${colours[1]}, ${colours[2]})`);
                         }
                     }
@@ -281,6 +285,8 @@ AFRAME.registerComponent('embed-data', {
         
     },
     remove: function(){
+        // When this component is removed, reset the colours of each district to the base colour,
+        // and remove the rotating boxes + legend.
         const el = this.el;
         const data = this.data;
         const id = el.id;
@@ -358,6 +364,10 @@ AFRAME.registerComponent('model-initial-settings', {
 // Create on-hover component that changes size of entity and displays a given input.
 AFRAME.registerComponent('interaction-on-hover', {
     schema: {
+        // Takes input that can alter the size of the element,
+        // The text to displayed,
+        // The width of the text,
+        // and the color of the text.
         alterSize : {type: 'boolean', default: false},
         input: {type: 'string', default: 'ok'}, 
         textWidth : {type: 'string', default: '10'},
@@ -375,6 +385,8 @@ AFRAME.registerComponent('interaction-on-hover', {
 
 
         //console.log(`add-text has been added to object`);
+
+        // Create text element, with the parameters set according to the components schema.
         let txt = document.createElement('a-entity');
         txt.setAttribute('text', {
             'color' : textColor,
@@ -382,26 +394,36 @@ AFRAME.registerComponent('interaction-on-hover', {
             'width': textWidth,
             'value' : textValue
         });
+        // Add ID so that text can be queried and added quickly.
         txt.setAttribute('id', `txt-${id}`);
+        // Set position to 2 units in the positive y axis.
         txt.setAttribute('position', '0 2 0');
 
+        // Determine the camera's current rotation, and calculate the opposite in radians
+        // using the PI number.
         let camRot = camera.object3D.rotation
         let txtRot = (camRot._y + Math.PI);
 
-        //txt.object3D.rotation.x = parseFloat(camRot._x);
+        // Set the text rotation to be the oppposite of the Camera elements y rotation in radians.
+        // This means that when the user interacts with the element the text will always be rotated to 
+        // face the camera/user.
         txt.object3D.rotation.y = parseFloat(Math.PI+camRot._y);
-        //txt.object3D.rotation.z = parseFloat(camRot._z);
-        console.log(`x: ${camRot._x}, Y: ${camRot._y}`);
-        console.log(`Inverse Rot: ${txtRot}`);
         
-       
+        // De-Bugging
+        //console.log(`x: ${camRot._x}, Y: ${camRot._y}`);
+        //console.log(`Inverse Rot: ${txtRot}`);
+        
+       // Append the text element to the components parent element.
         el.appendChild(txt);
         
+        // If the alterSize attribute is set to true, change the size of the parent element by 110%.
         if(alterSize){
             el.object3D.scale.multiplyScalar(1.1);
         }
         
     },
+
+    // When this component is removed, delete the text element, and reduce the size of the parent element by 110%
     remove: function(){
         const el = this.el;
         const data = this.data;
@@ -423,7 +445,7 @@ AFRAME.registerComponent('interaction-on-hover', {
     }
 })
 
-
+// Component that colours each triangle of a 3D object separately.
 AFRAME.registerComponent('multicolored-cube', {
     dependencies: ['geometry'],
   
