@@ -1,6 +1,6 @@
 // Node.js API server for the web-urban analytics app.
 // Author: Harvey Reynier
-// Description: FILL ME.
+// Description: Custom and simple REST api for the NYC VR data explorer.
 // Modules: Express, ejs, path.
 
 //  Setup the express server + global module constants.
@@ -46,7 +46,7 @@ app.get('/data/subway-stations', function(req, res){
     });
 })
 
-// Returns json of predicted annual average Nitric oxide across manhattan, Dec 2017-Dec 2018 - This is given as a point value
+// Returns json of predicted annual average pollutant across manhattan, Dec 2017-Dec 2018 - This is given as a point value
 // every 300m. This has been adapted from a raster supplied by the open NYC database.
 app.get('/data/air-pollution/:pollutant/:year', function(req, res){
 

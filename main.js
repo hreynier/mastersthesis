@@ -3,26 +3,14 @@
 // ------- DESCRIPTION ------- //
 
 
-// DESCRIPTION GOES HERE.
+// Main script file for the NYC VR data explorer application.
+// This file handles most of the data requests, UI functionality, rendering and painting
+// of data onto the VR environment.
 //
-
-// Declare package imports.
-
-/*module.exports = {
-  distance: require('@turf/distance'),
-  bearing: require('@turf/bearing')
-};
-*/
-
-
-/*import distance from './src/turf.'
-import bearing from '@turf/bearing'
-*/
-
-
 
 
 // Declare globals
+// Lat + Lon of the center of basemap, coinciding with position [0,0,0] in A-Frame.
 const mapCenter = [-73.953294, 40.756234];
 const sceneElement = document.querySelector('a-scene');
 const cameraEl 		= document.querySelector('a-entity[camera]');
@@ -32,7 +20,8 @@ let station_object = [];
 let pollutionObject;
 
 
-// Declare functions
+// Declare function that calculates the cartesian coordinates of a given latitude and longitude object
+// according to the prescribed center coordinates.
 function getCoordsFromCenter(centerCoordinates, nextCoordinates) {
 	// Declare center XY coordinate object.
 	const centerXY = { x: 0, y: 0 }
@@ -52,7 +41,7 @@ function getCoordsFromCenter(centerCoordinates, nextCoordinates) {
 	return xy
 }
 
-// Stations Data
+// Declare asynchronous function for requesting the point type datasets through the API.
 async function getPoints(pointType) {
 	let url = `http://localhost:3000/data/${pointType}`;
 	console.log(`API Endpoint: ${url}`);
@@ -126,53 +115,60 @@ async function getPoints(pointType) {
 	return position;
 }
 
+// Function to then render the fetched point datatypes.
+// Utilises the cartesian coordinate function to attribute position to each lat/lon pair.
 function renderPoint(positionObject, elementClass, geom, col) {
 
+
+	// Loop through the object containing the XYZ positions and value of each point.
 	for (let [index, entry] of Object.entries(positionObject.xyz)) {
 		console.log(`index: ${index}, value: ${entry}`);
-			let posX = parseFloat(entry[0]);
-			let posY = parseFloat(entry[1]);
-			let posZ = parseFloat(entry[2]);
-			let name = positionObject.name;
-			name = name[index];
+		let posX = parseFloat(entry[0]);
+		let posY = parseFloat(entry[1]);
+		let posZ = parseFloat(entry[2]);
+		let name = positionObject.name;
+		name = name[index];
 
-			console.log(`posX: ${posX}, Y: ${posY}, Z: ${posZ}`);
+		//console.log(`posX: ${posX}, Y: ${posY}, Z: ${posZ}`);
 
-			// Create new element for points.
-			let pointEl = document.createElement('a-entity');
-			pointEl.setAttribute('class', elementClass);
-			pointEl.setAttribute('position', { x: posX, y: posY, z: posZ });
-			pointEl.setAttribute('material', { color: col });
-			pointEl.setAttribute('geometry', { primitive: geom, width: 0.02, height: 4, depth: 0.02 });
-			//pointEl.setAttribute('scale', { x: 0.02, y: 5, z: 0.02 }); // Hard-coded - need to implement update method.
-			//console.log(`Element: ${ind}`);
+		// Create new element for points.
+		let pointEl = document.createElement('a-entity');
+		pointEl.setAttribute('class', elementClass);
+		pointEl.setAttribute('position', { x: posX, y: posY, z: posZ });
+		pointEl.setAttribute('material', { color: col });
+		pointEl.setAttribute('geometry', { primitive: geom, width: 0.02, height: 4, depth: 0.02 });
 
 
-			// Add mouse-enter event listener to show the name of point.
-			pointEl.addEventListener('mouseenter', () => {
-				
-				pointEl.setAttribute('interaction-on-hover', {
-					'alterSize' : false,
-					'input': name,
-					'textWidth': '3',
-					'color': '#d19d11'
-				})
-
+		// Add mouse-enter event listener to add interaction mechanic to show name of each point
+		// when users hover.
+		pointEl.addEventListener('mouseenter', () => {
+			
+			pointEl.setAttribute('interaction-on-hover', {
+				'alterSize' : false,
+				'input': name,
+				'textWidth': '3',
+				'color': '#d19d11'
 			})
 
-			pointEl.addEventListener('mouseleave', () => {
-				pointEl.removeAttribute('interaction-on-hover');
-			})
+		})
 
-			sceneElement.appendChild(pointEl);
+		pointEl.addEventListener('mouseleave', () => {
+			pointEl.removeAttribute('interaction-on-hover');
+		})
+		
+		// Append each element to the scene.
+		sceneElement.appendChild(pointEl);
 	}
 
 }
 
 
+// Declare asynchronous function for requesting the embedded type datasets through the API.
 async function fetchEmbeddedData(datafamily) {
 	let url = `http://localhost:3000/data/embed/${datafamily}`;
 
+	// Declare max+min variables to determine the range of each dataset.
+	// This is needed to determine how each point is coloured and rendered.
 	let pop00Min = Number.MAX_VALUE;
 	let pop00Max = Number.MIN_VALUE;
 	let pop10Min = Number.MAX_VALUE;
@@ -189,9 +185,12 @@ async function fetchEmbeddedData(datafamily) {
 	let resultArr = [];
 
 
+	// Request data.
 	const response = await fetch(url);
 	const json = await response.json();
 
+	// Once data has been fetched, loop through JSON
+	// mapping each value.
 	for (var i = 0; i < json.length; i++) {
 		let obj = json[i];
 		let distName = (obj.CDName);
@@ -202,6 +201,8 @@ async function fetchEmbeddedData(datafamily) {
 		let employment 		= parseFloat(obj.emp);
 		let employmentPercent= parseFloat(obj.empPerc);
 		//console.log(`lat: ${lat}, lon: ${lon}, type: ${typeof(lon)}`);
+
+		// If statements used to determine the min and max variable in each dataset.
 		if (population2000 > pop00Max) {
 			pop00Max = population2000;
 		}
@@ -244,10 +245,12 @@ async function fetchEmbeddedData(datafamily) {
 			empPerMin = employmentPercent;
 		}
 
+		// Create array that stores each value for each row.
 		let array = [distName, population2000, population2010, populationChange, income, employment, employmentPercent];
 		resultArr.push(array);
 	}
 
+	// Create object that stores all the min/max pairs and the entire dataset.
 	const population = {
 		min00: pop00Min,
 		max00: pop00Max,
@@ -264,17 +267,18 @@ async function fetchEmbeddedData(datafamily) {
 		data: resultArr
 	}
 
-	//let styledOut = colourEmbedded(population);
-	//console.log(styledOut);
-
+	// Return this object to allow for rendering later.
 	return population;
 }
 
+// Function that determines the RGB colour for each community district based on the given dataset.
 function colourEmbedded(dataObject) {
 
+	// Declare the min and max colours.
 	let loCol = [222, 235, 247];
 	let hiCol = [50, 134, 195];
 
+	// Declare the min and max of each dataset.
 	let min00 = dataObject.min00;
 	let max00 = dataObject.max00;
 
@@ -303,6 +307,7 @@ function colourEmbedded(dataObject) {
 	let styleEmp	= [];
 	let styleEmpPerc =[];
 
+	// For each datapoint, determine the ratio between min and max and thus calculate the required RGB value.
 	for (x of array) {
 
 		let delta00 = (x[1] - min00) / (max00 - min00);
@@ -329,6 +334,7 @@ function colourEmbedded(dataObject) {
 			colourEmpPerc[i] = parseInt((hiCol[i] - loCol[i]) * deltaEmpPerc + loCol[i]);
 		}
 
+		// Push colour arrays to each respective dataset object.
 		district.push(x[0]);
 		style00.push(colour00);
 		style10.push(colour10);
@@ -337,6 +343,7 @@ function colourEmbedded(dataObject) {
 		styleEmp.push(colourEmp);
 		styleEmpPerc.push(colourEmpPerc);
 	}
+	// Return this object for use later.
 	const styleObject = {
 		district: district,
 		pop00: style00,
@@ -351,6 +358,7 @@ function colourEmbedded(dataObject) {
 	return styleObject
 }
 
+// Declare asynchronous function for requesting the 'bubble' type datasets.
 async function fetchValues(dataFamily, dataType, year) {
 
 	// Store API url.
@@ -395,14 +403,19 @@ async function fetchValues(dataFamily, dataType, year) {
 	return data;
 }
 
+// Function that upon given the requested bubble data, style each point and 
+// render it in the VR environment.
 function stylePollutionData(minimum, maximum, row) {
+
+	// Declare colours, sizes, and y position for the min and max points within the given dataset.
 	let loCol = [255, 255, 153];
 	let hiCol = [255, 80, 80];
 	let loSize = 0.005;
 	let hiSize = 0.5;
 	let loHeight = 1.1;
 	let hiHeight = 3;
-	//console.log(`row: ${row}`);
+
+	// Store input as variables
 	let min = minimum;
 	let max = maximum;
 	let lat = row[0];
@@ -412,6 +425,7 @@ function stylePollutionData(minimum, maximum, row) {
 	//	Delta represents ratio of where the data value sits between min and max.
 	let delta = (value - min) / (max - min);
 
+	// Determine the A-Frame position using the cartesian calc function
 	let latlon = [lat, lon];
 	let cartesian = getCoordsFromCenter(mapCenter, latlon);
 
@@ -424,9 +438,11 @@ function stylePollutionData(minimum, maximum, row) {
 		colour[i] = parseInt((hiCol[i] - loCol[i]) * delta + loCol[i]);
 	}
 
+	// Assign size and height based on the same ratio.
 	let size = (hiSize - loSize) * delta + loSize;
 	let height = (hiHeight - loHeight) * delta + loHeight;
 
+	// Create entity for each bubble point.
 	let obj = document.createElement('a-entity');
 
 	obj.setAttribute('class', 'pollution');
@@ -444,7 +460,7 @@ function stylePollutionData(minimum, maximum, row) {
 	oldPos = oldPos.y;
 
 
-
+	// Assign event listener to add interaction component + move the legend marker accordingly.
 	obj.addEventListener('mouseenter', () => {
 		console.log("mouse has entered.");
 		obj.setAttribute('interaction-on-hover', {
@@ -476,10 +492,11 @@ function stylePollutionData(minimum, maximum, row) {
     	marker.object3D.position.set(0, oldPos, 0);
 		
 	})
+	// Append entity to scene
 	sceneElement.appendChild(obj);
 }
 
-//
+// UI functions
 
 function createLegend(textObject, side, colorObject, id){
     /*  Creates an interactive legend in A-Frame, with customisation based on 
@@ -767,32 +784,7 @@ class LegendLabels {
 
 
 
-//--------- SCRIPTS -------//
-// Need to think of a better title for this.
-
-// Get population data.
-/*let popPromise = fetchEmbeddedData('population');
-// Store in object to access the data later.
-let popObj = popPromise.then(value => {
-  console.log(`This is the value: ${value}`);
-  return value
-});*/
-
-// Get subway data.
-/*let subwayStations = getPoints('subway-stations');
-subwayStations.then(value => {
-    let renderStations = renderPoint(value, 'stations', 'box', 'red');
-    return renderStations
-})*/
-
-// Get NOx pollution data for 2018.
-/*let pollNO18 = fetchValues('air-pollution', 'no', 2018);
-pollNO18.then(value => {
-    for(var x of value.array){
-        stylePollutionData(value.min, value.max, x);
-    }
-}) */
-
+//--------- Scripts // Functionality -------//
 
 // ------ User Interface ------- //
 
@@ -811,7 +803,8 @@ let pointVis = pointMenu.getAttribute('visible');
 let embedVis = embedMenu.getAttribute('visible');
 let threeVis = threeMenu.getAttribute('visible');
 
-
+// Add click event listeners to show each of the sub-menus when
+// the respective button in the main menu is clicked.
 pointMenuBtn.addEventListener('click', () => { 
 	let pointVis = pointMenu.getAttribute('visible');
 	if(pointVis == false){
@@ -841,7 +834,9 @@ threeMenuBtn.addEventListener('click', () => {
 	}
 })
 
-// function to get all the radio values from a form.
+
+// Function that returns all the radio button values from a given form and
+// radio set.
 function getRadio(form, name){
 	let value;
 	let list= [];
@@ -869,24 +864,23 @@ document.querySelectorAll('a-radio').forEach(item => {
 		
 		// First, get the name of the radio group to allow to manipulate that group.
 		let radioName = item.getAttribute('name');
-		//item.setAttribute('checked', 'true');
+		
+		// Select all radio buttons within that group, and set all items to false.
 		document.querySelectorAll(`a-radio[name=${radioName}]`).forEach(el => {
 			el.setAttribute('checked', 'false');
-			//el.setAttribute('radioColor', "#757575");
-			//el.setAttribute('radioColorChecked', "#757575");
 		})
+		// Recheck the initial radio button that was clicked.
 		item.setAttribute('checked', 'true');
-		//item.setAttribute('radioColor', "#4076fd");
-		//item.setAttribute('radioColorChecked', "#4076fd");
 
+		// Debugging to check values.
 		document.querySelectorAll(`a-radio[name=${radioName}]`).forEach(ele =>{
-			console.log(`id: ${ele.getAttribute('label')}, checked: ${ele.getAttribute('checked')}`);
+			//console.log(`id: ${ele.getAttribute('label')}, checked: ${ele.getAttribute('checked')}`);
 		})
-		//console.log(`This is the radio group that was clicked: ${radioName}`);
 	})
 })
 
 // ------ Color Schemes for Legends ----- //
+// Create new color scheme objects using the gradient class and colorGradient function.
 
 // Yellow -> Red (used in pollution bubbles.)
 let yellow 	= [255, 255, 153];
@@ -894,9 +888,9 @@ let red 	= [255, 80, 80];
 let stepNo 	= 10;
 
 let ylwRed 	= new Gradient(red, yellow, stepNo);
-console.log(`ylwRed object:`);
-console.log(ylwRed);
-console.log(ylwRed.bottomColor);
+//console.log(`ylwRed object:`);
+//console.log(ylwRed);
+//console.log(ylwRed.bottomColor);
 
 let ylwrdGradient = colorGradient(ylwRed.topColor, ylwRed.bottomColor, ylwRed.steps);
 
@@ -908,11 +902,11 @@ let whtBlu	= new Gradient(blue, white, stepNo);
 
 let wtbluGradient 	= colorGradient(whtBlu.topColor, whtBlu.bottomColor, whtBlu.steps);
 
-// CREATE MORE GRADIENTS HERE.
+// Add more gradients here if needed.
 
 
 
-// ------ Three/Bubble Menu ------ //
+// ------ Bubble Menu ------ //
 //
 // Declare variables for the radio buttons.
 let threeRenderBtn = document.querySelector('a-button[name="render-three"]');
@@ -920,7 +914,7 @@ let threeRenderBtn = document.querySelector('a-button[name="render-three"]');
 // Pollution
 
 // Get the radio buttion elements for each pollution type.
-let polNO = document.querySelector('a-radio[label=NOx]');
+let polNO = document.querySelector('a-radio[label=NO]');
 let polO3 = document.querySelector('a-radio[label=O3]');
 let polPM = document.getElementById('PM');
 let polOff = document.querySelector('a-radio[label=None]');
@@ -1238,7 +1232,7 @@ embedRenderBtn.addEventListener('click', () => {
 	}
 
 	// Log the final popType
-	console.log(`popType : ${popType}`);
+	//console.log(`popType : ${popType}`);
 
 	// If the embedded data object does exist,
 	// no need to fetch data again.
