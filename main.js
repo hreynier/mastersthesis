@@ -41,6 +41,7 @@ function getCoordsFromCenter(centerCoordinates, nextCoordinates) {
 	return xy
 }
 
+
 // Declare asynchronous function for requesting the point type datasets through the API.
 async function getPoints(pointType) {
 	let url = `http://localhost:3000/data/${pointType}`;
@@ -940,7 +941,7 @@ threeRenderBtn.addEventListener('click', () => {
 
 	// Switch expression for radio value (pollution).
 	switch (radioValue){
-		case 'NOx':
+		case 'NO':
 			polType = 'no';
 			title = 'Annual Avg Nitric Oxide';
 			subtitle = 'Dec 2017-Dec 2018, (ppb)';
