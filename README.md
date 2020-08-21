@@ -1,15 +1,14 @@
-# A Web-based Urban Analytics platform for Augmented Reality
-### Gif here!
-> XXXX Catchy tagline
+# Masters Thesis: Urban immersive analytics application using WebVR!
 
-This application has been developed by ____.
+
+This application has been developed by Harvey Reynier.
 
 ## Getting Started
 **Before you start, make sure you have node.js and npm installed globally on your computer.**
 
 **Step 1.**
 Clone this repo (and throw in a star too ;>),
-and navigate to the public_HTML folder that has been downloaded to your local repository.
+and navigate to the main folder that has been downloaded to your local repository.
 **Step 2.**
 In Terminal, Powershell, or any other command-line framework, run 
 ```shell
@@ -22,7 +21,7 @@ $ bower install
 To install the necessary javascript libraries for the front-end components.
 
 **Step 3.**
-Navigate to the */API* Folder, and run:
+Navigate to the */node-server* Folder, and run:
 ```shell
 $ npm install
 ```
@@ -33,7 +32,7 @@ $ bower install
 To also install the necessary libraries for the back-end components.
 
 **Step 4.**
-Host the files found within the API folder (you may need to change some server details).
+Host the files found within the */node-server* folder (you may need to change some server details).
 
 **Step 5.**
 You can now choose to either host the front-end or run it locally to test any changes you want to make.
@@ -47,7 +46,7 @@ You can now choose to either host the front-end or run it locally to test any ch
     - 🍴🐙 Fork this repo!
 
 - **Option 2**
-    - 👯 Clone this repo to your local machine using `https://github.com/HarveyReynier/SDCS.git`
+    - 👯 Clone this repo to your local machine using `https://github.com/HarveyReynier/mastersthesis.git`
 
 ### Step 2
 
@@ -55,7 +54,7 @@ You can now choose to either host the front-end or run it locally to test any ch
 
 ### Step 3
 
-- 🔃 Create a new pull request using <a href="" target="_blank">`blank`</a>.
+- 🔃 Create a new pull request if you want to add any features!
 
 ---
 
